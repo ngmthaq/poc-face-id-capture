@@ -925,10 +925,10 @@ export default function FaceRegister({ onComplete }: Props) {
           {/* bottom bar */}
           <div style={S.bottomBar}>
             <div style={S.instruction}>
-              {maskWarning
-                ? "Please take off your mask"
-                : outsideOval
-                  ? "Move your face into the oval"
+              {outsideOval
+                ? "Move your face into the oval"
+                : maskWarning
+                  ? "We need to see your full face"
                   : step.instruction}
             </div>
             {maskWarning && (
@@ -940,7 +940,7 @@ export default function FaceRegister({ onComplete }: Props) {
                   marginTop: 4,
                 }}
               >
-                Face must be fully visible for registration
+                Make sure nothing is covering your face
               </div>
             )}
             <div style={S.dots}>
