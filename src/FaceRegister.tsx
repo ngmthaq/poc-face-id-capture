@@ -47,42 +47,41 @@ const STEPS: StepDef[] = [
     label: "Left",
     instruction: "Turn your face left",
     target: { x: 120, y: 300 },
-    check: (y) => y > 12,
+    check: (y) => y > 10,
   },
   {
     name: "right",
     label: "Right",
     instruction: "Turn your face right",
     target: { x: 280, y: 300 },
-    check: (y) => y < -12,
+    check: (y) => y < -10,
   },
   {
     name: "up",
     label: "Up",
     instruction: "Tilt your face up",
     target: { x: 200, y: 230 },
-    check: (_y, p) => p < -10,
+    check: (_y, p) => p < -3,
   },
   {
     name: "down",
     label: "Down",
     instruction: "Tilt your face down",
     target: { x: 200, y: 380 },
-    check: (_y, p) => p > 6,
+    check: (_y, p) => p > 4,
   },
   {
     name: "tilt",
     label: "Tilt",
     instruction: "Tilt your head sideways",
     target: { x: 148, y: 250 },
-    check: (_y, _p, r) => Math.abs(r) > 5,
-    countdown: 1500,
+    check: (_y, _p, r) => Math.abs(r) > 3,
   },
 ];
 
 const ACCENT = "#4fffb0";
 const BG = "#0b0d0f";
-const COUNTDOWN_MS = 2000;
+const COUNTDOWN_MS = 1000;
 const MODEL_URL = "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model";
 
 /* ────────────────────── styles ───────────────────── */
@@ -96,7 +95,7 @@ const injectStyles = () => {
     @keyframes fr-pulse { 0%,100%{opacity:.7} 50%{opacity:1} }
     @keyframes fr-flash { 0%{opacity:.85} 100%{opacity:0} }
     @keyframes fr-countdown-ring {
-      from { stroke-dashoffset: 188.5; }
+      from { stroke-dashoffset: 865; }
       to   { stroke-dashoffset: 0; }
     }
     @keyframes fr-fade-in { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
@@ -275,7 +274,11 @@ const S: Record<string, CSSProperties> = {
     letterSpacing: "-0.02em",
     marginBottom: 6,
   },
-  resultSub: { fontSize: 14, color: "rgba(255,255,255,.45)", marginBottom: 32 },
+  resultSub: {
+    fontSize: 14,
+    color: "rgba(255,255,255,.45)",
+    marginBottom: 32,
+  },
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(3,1fr)",
@@ -337,17 +340,16 @@ export default function FaceRegister({ onComplete }: Props) {
   const [captures, setCaptures] = useState<Capture[]>([]);
   const [matched, setMatched] = useState(false);
   const [countdownActive, setCountdownActive] = useState(false);
-  const [countdownNum, setCountdownNum] = useState(3);
   const [showFlash, setShowFlash] = useState(false);
   const [modelsLoaded, setModelsLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [maskWarning, setMaskWarning] = useState(false);
+  const [outsideOval, setOutsideOval] = useState(false);
 
   // crosshair animation
   const [crosshairPos, setCrosshairPos] = useState(STEPS[0].target);
   // nose tracking dot (SVG coords)
-  const [nosePos, setNosePos] = useState<{ x: number; y: number } | null>(
-    null,
-  );
+  const [nosePos, setNosePos] = useState<{ x: number; y: number } | null>(null);
   const prevStepRef = useRef(0);
 
   useEffect(() => {
@@ -408,10 +410,13 @@ export default function FaceRegister({ onComplete }: Props) {
 
       let isMatched = false;
       let cdStart = 0;
-      let lastCdNum = 3;
+
       let missCount = 0;
       const MISS_GRACE = 3; // allow a few missed frames before resetting
       let stopped = false;
+      let maskFrames = 0;
+      let noMaskFrames = 0;
+      const MASK_THRESHOLD = 5; // consecutive frames to confirm mask state
 
       const detect = async () => {
         if (stopped) return;
@@ -454,10 +459,47 @@ export default function FaceRegister({ onComplete }: Props) {
             const jaw = lm.getJawOutline();
             const faceWidth = Math.abs(jaw[jaw.length - 1].x - jaw[0].x);
             const faceHeight = Math.abs(positions[8].y - positions[19].y);
+            // Mask detection: check upper-to-lower lip vertical distance.
+            // Points 51 (top of upper lip) and 57 (bottom of lower lip).
+            // With a mask these collapse; without mask there's always a gap.
+            const upperLip = positions[51];
+            const lowerLip = positions[57];
+            const lipGap = Math.abs(lowerLip.y - upperLip.y) / faceHeight;
+            const maskThisFrame = lipGap < 0.12;
+
+            // Stabilize: require consecutive frames to switch state
+            if (maskThisFrame) {
+              maskFrames++;
+              noMaskFrames = 0;
+            } else {
+              noMaskFrames++;
+              maskFrames = 0;
+            }
+
+            const maskConfirmed = maskFrames >= MASK_THRESHOLD;
+            const noMaskConfirmed = noMaskFrames >= MASK_THRESHOLD;
+
+            if (maskConfirmed) {
+              setMaskWarning(true);
+            } else if (noMaskConfirmed) {
+              setMaskWarning(false);
+            }
+            // else: keep previous state (no flicker)
+
+            console.log(
+              `[FaceReg] lipGap=${lipGap.toFixed(3)} mask=${maskConfirmed ? "yes" : "no"} (${maskFrames}/${MASK_THRESHOLD})`,
+            );
+
+            // If mask confirmed, skip detection — wait for user to remove it
+            if (maskConfirmed) {
+              setNosePos(null);
+              loopRef.current = window.setTimeout(detect, 100);
+              return;
+            }
 
             const yaw = ((noseTip.x - eyeMidX) / (faceWidth * 0.5)) * 45;
-            const pitch =
-              ((noseTip.y - eyeMidY) / faceHeight - 0.21) * 80;
+            const pitch = ((noseTip.y - eyeMidY) / faceHeight - 0.21) * 80;
+
             const roll =
               Math.atan2(
                 rightEyeCenter.y - leftEyeCenter.y,
@@ -466,38 +508,40 @@ export default function FaceRegister({ onComplete }: Props) {
               (180 / Math.PI);
 
             console.log(
-              `[FaceReg] step=${step.name} yaw=${yaw.toFixed(1)} pitch=${pitch.toFixed(1)} roll=${roll.toFixed(1)}`,
+              `[FaceReg] step=${step.name} yaw=${yaw.toFixed(1)} pitch=${pitch.toFixed(1)} roll=${roll.toFixed(1)} nose=${maskConfirmed ? "masked" : "ok"}`,
             );
 
-            // map nose tip from video pixels to SVG viewBox (400x600)
-            // video is mirrored so flip x
             const vw = video.videoWidth || 1;
             const vh = video.videoHeight || 1;
-            setNosePos({
-              x: (1 - noseTip.x / vw) * 400,
-              y: (noseTip.y / vh) * 600,
-            });
+            // Map nose to SVG viewBox coords (mirrored)
+            const svgX = (1 - noseTip.x / vw) * 400;
+            const svgY = (noseTip.y / vh) * 600;
+            setNosePos({ x: svgX, y: svgY });
 
-            const passes = step.check(yaw, pitch, roll);
+            // Check face is centered in oval (only during center step)
+            const faceCenterX =
+              (1 - (positions[27].x + positions[8].x) / 2 / vw) * 400;
+            const faceCenterY =
+              ((positions[27].y + positions[8].y) / 2 / vh) * 600;
+            const offCenterX = Math.abs(faceCenterX - 200);
+            const offCenterY = Math.abs(faceCenterY - 320);
+            const isCentered = offCenterX < 30 && offCenterY < 40;
+
+            const centerOk = step.name === "center" ? isCentered : true;
+            setOutsideOval(!centerOk);
+
+            const passes = centerOk && step.check(yaw, pitch, roll);
 
             if (passes) {
               missCount = 0;
               if (!isMatched) {
                 isMatched = true;
                 cdStart = performance.now();
-                lastCdNum = 3;
                 setMatched(true);
                 setCountdownActive(true);
-                setCountdownNum(3);
                 countdownStart.current = cdStart;
               }
               const elapsed = performance.now() - cdStart;
-              const remaining = Math.ceil((stepCountdown - elapsed) / 1000);
-              const clampedNum = Math.max(1, Math.min(3, remaining));
-              if (clampedNum !== lastCdNum) {
-                lastCdNum = clampedNum;
-                setCountdownNum(clampedNum);
-              }
 
               if (elapsed >= stepCountdown) {
                 stopped = true;
@@ -522,10 +566,7 @@ export default function FaceRegister({ onComplete }: Props) {
                 }
                 setCurrentStep(nextIdx);
                 setCrosshairPos(STEPS[nextIdx].target);
-                setTimeout(
-                  () => runDetection(nextIdx, updatedCaptures),
-                  400,
-                );
+                setTimeout(() => runDetection(nextIdx, updatedCaptures), 400);
                 return;
               }
             } else {
@@ -536,7 +577,6 @@ export default function FaceRegister({ onComplete }: Props) {
                 missCount = 0;
                 setMatched(false);
                 setCountdownActive(false);
-                setCountdownNum(3);
               }
             }
           } else {
@@ -548,7 +588,6 @@ export default function FaceRegister({ onComplete }: Props) {
               missCount = 0;
               setMatched(false);
               setCountdownActive(false);
-              setCountdownNum(3);
             }
           }
         } catch (err) {
@@ -645,6 +684,32 @@ export default function FaceRegister({ onComplete }: Props) {
   const crossColor = matched ? ACCENT : "rgba(255,255,255,0.22)";
   const crossGlow = matched ? `drop-shadow(0 0 8px ${ACCENT})` : "none";
 
+  // Curve offsets based on step direction
+  // Vertical line bows left/right, horizontal line bows up/down
+  const curveAmount = 30;
+  let vCurve = 0; // vertical line horizontal offset (left/right)
+  let hCurve = 0; // horizontal line vertical offset (up/down)
+  switch (step.name) {
+    case "left":
+      vCurve = -curveAmount;
+      break;
+    case "right":
+      vCurve = curveAmount;
+      break;
+    case "up":
+      hCurve = -curveAmount;
+      break;
+    case "down":
+      hCurve = curveAmount;
+      break;
+    case "tilt":
+      vCurve = -curveAmount * 0.7;
+      hCurve = -curveAmount * 0.7;
+      break;
+    default:
+      break; // center: no curve
+  }
+
   const renderOverlay = () => (
     <svg
       viewBox="0 0 400 600"
@@ -666,7 +731,7 @@ export default function FaceRegister({ onComplete }: Props) {
         mask="url(#oval-mask)"
       />
 
-      {/* oval border */}
+      {/* oval border — doubles as countdown */}
       <ellipse
         cx="200"
         cy="270"
@@ -676,76 +741,82 @@ export default function FaceRegister({ onComplete }: Props) {
         stroke="rgba(255,255,255,0.25)"
         strokeWidth="1.5"
       />
-
-      {/* crosshair lines */}
-      <line
-        x1={tx}
-        y1="0"
-        x2={tx}
-        y2="600"
-        stroke={crossColor}
-        strokeWidth="1.2"
-        style={{ filter: crossGlow, transition: "all .4s ease" }}
-      />
-      <line
-        x1="0"
-        y1={ty}
-        x2="400"
-        y2={ty}
-        stroke={crossColor}
-        strokeWidth="1.2"
-        style={{ filter: crossGlow, transition: "all .4s ease" }}
-      />
-
-      {/* crosshair center — outer ring */}
-      <circle
-        cx={tx}
-        cy={ty}
-        r="20"
-        fill="none"
-        stroke={crossColor}
-        strokeWidth="1.8"
-        style={{ filter: crossGlow, transition: "all .4s ease" }}
-      />
-      {/* crosshair center — inner ring */}
-      <circle
-        cx={tx}
-        cy={ty}
-        r="10"
-        fill="none"
-        stroke={crossColor}
-        strokeWidth="1.2"
-        opacity={0.5}
-        style={{ filter: crossGlow, transition: "all .4s ease" }}
-      />
-      {/* crosshair center — dot */}
-      <circle
-        cx={tx}
-        cy={ty}
-        r="4"
-        fill={crossColor}
-        style={{ filter: crossGlow, transition: "all .4s ease" }}
-      />
-
-      {/* countdown ring */}
       {countdownActive && (
-        <circle
-          cx={tx}
-          cy={ty}
-          r="30"
+        <ellipse
+          cx="200"
+          cy="270"
+          rx="110"
+          ry="145"
           fill="none"
           stroke={ACCENT}
-          strokeWidth="2.5"
-          strokeDasharray="188.5"
-          strokeDashoffset="188.5"
+          strokeWidth="3"
+          strokeDasharray="865"
+          strokeDashoffset="865"
           strokeLinecap="round"
           style={{
-            animation: `fr-countdown-ring ${(STEPS[currentStep]?.countdown ?? COUNTDOWN_MS)}ms linear forwards`,
+            animation: `fr-countdown-ring ${STEPS[currentStep]?.countdown ?? COUNTDOWN_MS}ms linear forwards`,
             filter: `drop-shadow(0 0 6px ${ACCENT})`,
           }}
-          transform={`rotate(-90 ${tx} ${ty})`}
         />
       )}
+
+      {/* curved crosshair lines — two segments each, passing through (tx,ty) */}
+      <path
+        d={`M ${tx} 0 Q ${tx + vCurve} ${ty * 0.5} ${tx} ${ty} Q ${tx + vCurve} ${ty + (600 - ty) * 0.5} ${tx} 600`}
+        fill="none"
+        stroke={crossColor}
+        strokeWidth="1.2"
+        style={{ filter: crossGlow, transition: "all .4s ease" }}
+      />
+      <path
+        d={`M 0 ${ty} Q ${tx * 0.5} ${ty + hCurve} ${tx} ${ty} Q ${tx + (400 - tx) * 0.5} ${ty + hCurve} 400 ${ty}`}
+        fill="none"
+        stroke={crossColor}
+        strokeWidth="1.2"
+        style={{ filter: crossGlow, transition: "all .4s ease" }}
+      />
+
+      {/* crosshair center — at exact intersection */}
+      {(() => {
+        return (
+          <>
+            {/* outer ring */}
+            <ellipse
+              cx={tx}
+              cy={ty}
+              rx={20 - Math.abs(vCurve) * 0.2}
+              ry={20 - Math.abs(hCurve) * 0.2}
+              fill="none"
+              stroke={crossColor}
+              strokeWidth="1.8"
+              transform={`rotate(${vCurve > 0 ? 8 : vCurve < 0 ? -8 : 0} ${tx} ${ty})`}
+              style={{ filter: crossGlow, transition: "all .4s ease" }}
+            />
+            {/* inner ring */}
+            <ellipse
+              cx={tx}
+              cy={ty}
+              rx={10 - Math.abs(vCurve) * 0.1}
+              ry={10 - Math.abs(hCurve) * 0.1}
+              fill="none"
+              stroke={crossColor}
+              strokeWidth="1.2"
+              opacity={0.5}
+              transform={`rotate(${vCurve > 0 ? 8 : vCurve < 0 ? -8 : 0} ${tx} ${ty})`}
+              style={{ filter: crossGlow, transition: "all .4s ease" }}
+            />
+            {/* dot */}
+            <circle
+              cx={tx}
+              cy={ty}
+              r="4"
+              fill={crossColor}
+              style={{ filter: crossGlow, transition: "all .4s ease" }}
+            />
+          </>
+        );
+      })()}
+
 
       {/* nose tracking dot */}
       {nosePos && (
@@ -851,28 +922,27 @@ export default function FaceRegister({ onComplete }: Props) {
           </div>
 
           {/* countdown number */}
-          {countdownActive && (
-            <div
-              style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                zIndex: 6,
-                fontSize: 48,
-                fontWeight: 700,
-                color: ACCENT,
-                textShadow: `0 0 20px ${ACCENT}`,
-                animation: "fr-pulse .6s ease infinite",
-              }}
-            >
-              {countdownNum}
-            </div>
-          )}
-
           {/* bottom bar */}
           <div style={S.bottomBar}>
-            <div style={S.instruction}>{step.instruction}</div>
+            <div style={S.instruction}>
+              {maskWarning
+                ? "Please take off your mask"
+                : outsideOval
+                  ? "Move your face into the oval"
+                  : step.instruction}
+            </div>
+            {maskWarning && (
+              <div
+                style={{
+                  fontSize: 13,
+                  color: "#ff6b6b",
+                  fontWeight: 500,
+                  marginTop: 4,
+                }}
+              >
+                Face must be fully visible for registration
+              </div>
+            )}
             <div style={S.dots}>
               {STEPS.map((_, i) => (
                 <div
