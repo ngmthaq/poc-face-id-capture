@@ -6,12 +6,14 @@ interface ResultScreenProps {
   captures: Capture[];
   onReset: () => void;
   onSave: () => void;
+  onExit?: () => void;
 }
 
 export default function ResultScreen({
   captures,
   onReset,
   onSave,
+  onExit,
 }: ResultScreenProps) {
   const { t } = useTranslation();
 
@@ -43,13 +45,20 @@ export default function ResultScreen({
           </div>
         ))}
       </div>
-      <div style={S.resultBtns}>
-        <button style={{ ...S.btnOutline, flex: 1 }} onClick={onReset}>
-          {t("faceRegister.registerAgain")}
-        </button>
-        <button style={{ ...S.btn, flex: 1 }} onClick={onSave}>
+      <div style={S.resultBtnsWrap}>
+        <button style={{ ...S.btn, width: "100%" }} onClick={onSave}>
           {t("faceRegister.save")}
         </button>
+        <div style={S.resultBtns}>
+          <button style={{ ...S.btnOutline, flex: 1 }} onClick={onReset}>
+            {t("faceRegister.registerAgain")}
+          </button>
+          {onExit && (
+            <button style={{ ...S.btnOutline, flex: 1 }} onClick={onExit}>
+              {t("faceRegister.discard")}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

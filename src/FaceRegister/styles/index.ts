@@ -263,7 +263,14 @@ export const S: Record<string, CSSProperties> = {
     fontWeight: 500,
     color: "rgba(255,255,255,.45)",
   },
-  resultBtns: { display: "flex", gap: 12, width: "100%", maxWidth: 380 },
+  resultBtnsWrap: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 12,
+    width: "100%",
+    maxWidth: 380,
+  },
+  resultBtns: { display: "flex", gap: 12, width: "100%" },
 
   /* loading */
   loadingOverlay: {

@@ -24,7 +24,7 @@ export type { Capture, FaceRegisterProps, FaceRegisterTranslations };
 
 export default function FaceRegister({
   onComplete,
-  onBack,
+  onExit,
   locale,
   translations,
 }: FaceRegisterProps) {
@@ -146,7 +146,7 @@ export default function FaceRegister({
       {loading && <LoadingOverlay />}
 
       {screen === "intro" && (
-        <IntroScreen onStart={handleStart} onBack={onBack} />
+        <IntroScreen onStart={handleStart} onExit={onExit} />
       )}
 
       {screen === "capture" && (
@@ -171,6 +171,7 @@ export default function FaceRegister({
           captures={captures}
           onReset={handleReset}
           onSave={handleSave}
+          onExit={onExit}
         />
       )}
     </div>

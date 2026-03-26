@@ -46,11 +46,12 @@ export interface FaceRegisterTranslations {
   save?: string;
   loadingModels?: string;
   back?: string;
+  discard?: string;
 }
 
 export interface FaceRegisterProps {
   onComplete?: (captures: Capture[]) => void;
-  onBack?: () => void;
+  onExit?: () => void;
   locale?: string;
   translations?: FaceRegisterTranslations;
 }

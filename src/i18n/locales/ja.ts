@@ -38,7 +38,8 @@ export default {
     resultTitle: "登録完了",
     resultSub: "{{count}}枚の顔画像を撮影しました",
     registerAgain: "もう一度登録",
-    save: "保存",
+    save: "保存して続行",
+    discard: "破棄して終了",
 
     // Loading
     loadingModels: "顔検出モデルを読み込んでいます...",

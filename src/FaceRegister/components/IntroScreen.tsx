@@ -4,16 +4,16 @@ import { S } from "../styles";
 
 interface IntroScreenProps {
   onStart: () => void;
-  onBack?: () => void;
+  onExit?: () => void;
 }
 
-export default function IntroScreen({ onStart, onBack }: IntroScreenProps) {
+export default function IntroScreen({ onStart, onExit }: IntroScreenProps) {
   const { t } = useTranslation();
 
   return (
     <div style={S.intro}>
-      {onBack && (
-        <button style={S.backBtn} onClick={onBack}>
+      {onExit && (
+        <button style={S.backBtn} onClick={onExit}>
           <svg
             width="20"
             height="20"

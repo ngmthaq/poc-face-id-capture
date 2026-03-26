@@ -4,7 +4,7 @@ export default function App() {
   return (
     <FaceRegister
       onComplete={(captures) => console.log("Captures:", captures)}
-      onBack={() => {}}
+      onExit={() => {}}
     />
   );
 }

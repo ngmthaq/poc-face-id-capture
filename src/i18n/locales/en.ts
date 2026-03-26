@@ -38,7 +38,8 @@ export default {
     resultTitle: "Registration Complete",
     resultSub: "{{count}} face images captured successfully",
     registerAgain: "Register Again",
-    save: "Save",
+    save: "Save & Continue",
+    discard: "Discard & Exit",
 
     // Loading
     loadingModels: "Loading face detection models...",
