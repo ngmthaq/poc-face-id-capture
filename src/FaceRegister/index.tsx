@@ -42,8 +42,10 @@ export default function FaceRegister({
     null,
   );
 
+  // Run synchronously before first render to ensure translations are available
+  ensureI18n(locale, translations);
+
   useEffect(() => {
-    ensureI18n(locale, translations);
     injectStyles();
   }, []);
 
