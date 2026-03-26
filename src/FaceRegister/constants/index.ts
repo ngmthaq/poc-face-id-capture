@@ -16,8 +16,41 @@ export interface StepDef {
   countdown?: number;
 }
 
+export interface FaceRegisterTranslations {
+  introTitle?: string;
+  introSub?: string;
+  introStep1?: string;
+  introStep2?: string;
+  introStep3?: string;
+  getStarted?: string;
+  hudTitle?: string;
+  hudProgress?: string;
+  stepCenter?: string;
+  stepLeft?: string;
+  stepRight?: string;
+  stepUp?: string;
+  stepDown?: string;
+  stepTilt?: string;
+  outsideOval?: string;
+  maskWarning?: string;
+  maskWarningDetail?: string;
+  labelCenter?: string;
+  labelLeft?: string;
+  labelRight?: string;
+  labelUp?: string;
+  labelDown?: string;
+  labelTilt?: string;
+  resultTitle?: string;
+  resultSub?: string;
+  registerAgain?: string;
+  save?: string;
+  loadingModels?: string;
+}
+
 export interface FaceRegisterProps {
   onComplete?: (captures: Capture[]) => void;
+  locale?: string;
+  translations?: FaceRegisterTranslations;
 }
 
 export const STEPS: StepDef[] = [

@@ -4,6 +4,7 @@ import {
   type Screen,
   type Capture,
   type FaceRegisterProps,
+  type FaceRegisterTranslations,
 } from "./constants";
 import { ensureI18n } from "../i18n";
 import { injectStyles } from "./styles";
@@ -16,9 +17,13 @@ import CaptureScreen from "./components/CaptureScreen";
 import ResultScreen from "./components/ResultScreen";
 import LoadingOverlay from "./components/LoadingOverlay";
 
-export type { Capture, FaceRegisterProps };
+export type { Capture, FaceRegisterProps, FaceRegisterTranslations };
 
-export default function FaceRegister({ onComplete }: FaceRegisterProps) {
+export default function FaceRegister({
+  onComplete,
+  locale,
+  translations,
+}: FaceRegisterProps) {
   const { videoRef, canvasRef, startCamera, stopCamera, captureFrame } =
     useCamera();
 
@@ -38,7 +43,7 @@ export default function FaceRegister({ onComplete }: FaceRegisterProps) {
   );
 
   useEffect(() => {
-    ensureI18n();
+    ensureI18n(locale, translations);
     injectStyles();
   }, []);
 
