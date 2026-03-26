@@ -10,7 +10,7 @@ export function useCamera() {
 
   const startCamera = useCallback(async () => {
     const portrait = window.innerHeight > window.innerWidth;
-    console.log({ portrait });
+
 
     const stream = await navigator.mediaDevices.getUserMedia({
       video: {
