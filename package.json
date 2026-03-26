@@ -1,5 +1,5 @@
 {
-  "name": "@ngmthaq/react-face-id-capture",
+  "name": "@ngmthaq20/react-face-id-capture",
   "version": "1.0.0",
   "description": "React component for face registration with real-time face detection and multi-angle capture",
   "type": "module",
@@ -34,14 +34,18 @@
   "publishConfig": {
     "access": "public"
   },
+  "homepage": "https://github.com/ngmthaq/poc-face-id-capture#readme",
+  "bugs": {
+    "url": "https://github.com/ngmthaq/poc-face-id-capture/issues"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/user/face-id-capture"
+    "url": "https://github.com/ngmthaq/poc-face-id-capture.git"
   },
   "scripts": {
     "dev": "vite --host",
     "build": "tsc -b && vite build",
-    "build:lib": "tsc -p tsconfig.build.json && vite build",
+    "build:lib": "vite build && tsc -p tsconfig.build.json",
     "preview": "vite preview",
     "prepublishOnly": "npm run build:lib"
   },
