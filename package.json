@@ -1,20 +1,20 @@
 {
-  "name": "face-id-capture",
+  "name": "@ngmthaq/react-face-id-capture",
   "version": "1.0.0",
   "description": "React component for face registration with real-time face detection and multi-angle capture",
   "type": "module",
-  "main": "dist/face-id-capture.cjs",
-  "module": "dist/face-id-capture.js",
+  "main": "dist/react-face-id-capture.cjs",
+  "module": "dist/react-face-id-capture.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "import": {
         "types": "./dist/index.d.ts",
-        "default": "./dist/face-id-capture.js"
+        "default": "./dist/react-face-id-capture.js"
       },
       "require": {
         "types": "./dist/index.d.ts",
-        "default": "./dist/face-id-capture.cjs"
+        "default": "./dist/react-face-id-capture.cjs"
       }
     }
   },
@@ -31,6 +31,9 @@
     "face-capture"
   ],
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/user/face-id-capture"

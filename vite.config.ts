@@ -11,9 +11,9 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
-      name: "FaceIdCapture",
+      name: "ReactFaceIdCapture",
       formats: ["es", "cjs"],
-      fileName: "face-id-capture",
+      fileName: "react-face-id-capture",
     },
     rollupOptions: {
       external: [

@@ -1,11 +1,11 @@
-# face-id-capture
+# @ngmthaq/react-face-id-capture
 
 React component for face registration with real-time face detection and multi-angle capture. Guides users through capturing 6 face poses (center, left, right, up, down, tilt) using AI-powered face detection.
 
 ## Installation
 
 ```bash
-yarn add face-id-capture
+yarn add @ngmthaq/react-face-id-capture
 ```
 
 ### Peer Dependencies
@@ -19,7 +19,7 @@ yarn add react react-dom i18next react-i18next
 ## Quick Start
 
 ```tsx
-import { FaceRegister } from "face-id-capture";
+import { FaceRegister } from "@ngmthaq/react-face-id-capture";
 
 function App() {
   return (
@@ -134,7 +134,7 @@ import type {
   FaceRegisterProps,
   FaceRegisterTranslations,
   StepName,
-} from "face-id-capture";
+} from "@ngmthaq/react-face-id-capture";
 ```
 
 ## How It Works
