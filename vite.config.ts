@@ -1,6 +1,36 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [react()],
-})
+  build: {
+    lib: {
+      entry: resolve(__dirname, "src/index.ts"),
+      name: "FaceIdCapture",
+      formats: ["es", "cjs"],
+      fileName: "face-id-capture",
+    },
+    rollupOptions: {
+      external: [
+        "react",
+        "react-dom",
+        "react/jsx-runtime",
+        "i18next",
+        "react-i18next",
+      ],
+      output: {
+        globals: {
+          react: "React",
+          "react-dom": "ReactDOM",
+          "react/jsx-runtime": "jsxRuntime",
+          i18next: "i18next",
+          "react-i18next": "reactI18next",
+        },
+      },
+    },
+  },
+});

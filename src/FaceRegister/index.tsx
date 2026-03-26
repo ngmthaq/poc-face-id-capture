@@ -5,6 +5,7 @@ import {
   type Capture,
   type FaceRegisterProps,
 } from "./constants";
+import { ensureI18n } from "../i18n";
 import { injectStyles } from "./styles";
 import { S } from "./styles";
 import { useCamera } from "./hooks/useCamera";
@@ -37,6 +38,7 @@ export default function FaceRegister({ onComplete }: FaceRegisterProps) {
   );
 
   useEffect(() => {
+    ensureI18n();
     injectStyles();
   }, []);
 
