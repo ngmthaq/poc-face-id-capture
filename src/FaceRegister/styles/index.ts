@@ -32,7 +32,9 @@ export const S: Record<string, CSSProperties> = {
     fontFamily:
       '-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif',
     color: "#fff",
-    overflow: "hidden",
+    overflowX: "hidden",
+    overflowY: "auto",
+    WebkitOverflowScrolling: "touch",
     userSelect: "none",
     WebkitUserSelect: "none",
   },
@@ -207,9 +209,10 @@ export const S: Record<string, CSSProperties> = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    height: "100%",
+    minHeight: "100%",
     padding: "60px 24px 40px",
     overflowY: "auto",
+    WebkitOverflowScrolling: "touch",
     animation: "fr-fade-in .5s ease",
   },
   resultIcon: {
