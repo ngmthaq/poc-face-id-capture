@@ -1,13 +1,28 @@
 import {
-  SVG_WIDTH,
   SVG_HEIGHT,
-  OVAL_CX,
   FACE_CENTER_Y,
 } from "../constants";
 
 interface Point {
   x: number;
   y: number;
+}
+
+export interface SvgDims {
+  svgWidth: number;
+  svgHeight: number;
+  ovalCx: number;
+}
+
+/**
+ * Compute SVG viewBox dimensions that match the video's aspect ratio.
+ * Height is always SVG_HEIGHT (600). Width scales proportionally.
+ * The oval stays horizontally centered.
+ */
+export function getSvgDims(videoWidth: number, videoHeight: number): SvgDims {
+  const svgHeight = SVG_HEIGHT;
+  const svgWidth = (videoWidth / videoHeight) * svgHeight;
+  return { svgWidth, svgHeight, ovalCx: svgWidth / 2 };
 }
 
 export function getEyeCenter(eyePoints: Point[]): Point {
@@ -51,10 +66,11 @@ export function toSvgCoords(
   py: number,
   videoWidth: number,
   videoHeight: number,
+  dims: SvgDims,
 ): Point {
   return {
-    x: (1 - px / videoWidth) * SVG_WIDTH,
-    y: (py / videoHeight) * SVG_HEIGHT,
+    x: (1 - px / videoWidth) * dims.svgWidth,
+    y: (py / videoHeight) * dims.svgHeight,
   };
 }
 
@@ -62,12 +78,13 @@ export function checkFaceCentered(
   positions: Point[],
   videoWidth: number,
   videoHeight: number,
+  dims: SvgDims,
 ): boolean {
   const faceCenterX =
-    (1 - (positions[27].x + positions[8].x) / 2 / videoWidth) * SVG_WIDTH;
+    (1 - (positions[27].x + positions[8].x) / 2 / videoWidth) * dims.svgWidth;
   const faceCenterY =
-    ((positions[27].y + positions[8].y) / 2 / videoHeight) * SVG_HEIGHT;
-  const offCenterX = Math.abs(faceCenterX - OVAL_CX);
+    ((positions[27].y + positions[8].y) / 2 / videoHeight) * dims.svgHeight;
+  const offCenterX = Math.abs(faceCenterX - dims.ovalCx);
   const offCenterY = Math.abs(faceCenterY - FACE_CENTER_Y);
   return offCenterX < 30 && offCenterY < 40;
 }

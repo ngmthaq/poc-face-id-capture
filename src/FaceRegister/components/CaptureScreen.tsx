@@ -14,6 +14,8 @@ interface CaptureScreenProps {
   outsideOval: boolean;
   maskWarning: boolean;
   onBack?: () => void;
+  svgWidth: number;
+  ovalCx: number;
 }
 
 export default function CaptureScreen({
@@ -27,6 +29,8 @@ export default function CaptureScreen({
   outsideOval,
   maskWarning,
   onBack,
+  svgWidth,
+  ovalCx,
 }: CaptureScreenProps) {
   const { t } = useTranslation();
   const step = STEPS[currentStep] ?? STEPS[0];
@@ -40,6 +44,8 @@ export default function CaptureScreen({
         matched={matched}
         countdownActive={countdownActive}
         nosePos={nosePos}
+        svgWidth={svgWidth}
+        ovalCx={ovalCx}
       />
       {showFlash && <div style={S.flash} />}
 

@@ -1,6 +1,8 @@
 import { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import {
   STEPS,
+  SVG_WIDTH,
+  OVAL_CX,
   type Screen,
   type Capture,
   type FaceRegisterProps,
@@ -12,6 +14,7 @@ import { S } from "./styles";
 import { useCamera } from "./hooks/useCamera";
 import { useFaceModels } from "./hooks/useFaceModels";
 import { useFaceDetection } from "./hooks/useFaceDetection";
+import { getSvgDims } from "./utils/faceCalculations";
 import IntroScreen from "./components/IntroScreen";
 import CaptureScreen from "./components/CaptureScreen";
 import ResultScreen from "./components/ResultScreen";
@@ -25,8 +28,12 @@ export default function FaceRegister({
   locale,
   translations,
 }: FaceRegisterProps) {
-  const { videoRef, canvasRef, startCamera, stopCamera, captureFrame } =
+  const { videoRef, canvasRef, videoDims, startCamera, stopCamera, captureFrame } =
     useCamera();
+
+  const svgDims = videoDims
+    ? getSvgDims(videoDims.w, videoDims.h)
+    : { svgWidth: SVG_WIDTH, svgHeight: 600, ovalCx: OVAL_CX };
 
   const { loading, loadModels } = useFaceModels();
 
@@ -154,6 +161,8 @@ export default function FaceRegister({
           outsideOval={outsideOval}
           maskWarning={maskWarning}
           onBack={handleReset}
+          svgWidth={svgDims.svgWidth}
+          ovalCx={svgDims.ovalCx}
         />
       )}
 

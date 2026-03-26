@@ -15,6 +15,7 @@ import {
   toSvgCoords,
   checkFaceCentered,
   checkMask,
+  getSvgDims,
 } from "../utils/faceCalculations";
 
 interface DetectionCallbacks {
@@ -128,11 +129,12 @@ export function useFaceDetection(callbacks: DetectionCallbacks) {
 
             const vw = video.videoWidth || 1;
             const vh = video.videoHeight || 1;
-            const svgPos = toSvgCoords(noseTip.x, noseTip.y, vw, vh);
+            const dims = getSvgDims(vw, vh);
+            const svgPos = toSvgCoords(noseTip.x, noseTip.y, vw, vh, dims);
             callbacks.setNosePos(svgPos);
 
             // Face centering check (center step only)
-            const isCentered = checkFaceCentered(positions, vw, vh);
+            const isCentered = checkFaceCentered(positions, vw, vh, dims);
             const centerOk = step.name === "center" ? isCentered : true;
             callbacks.setOutsideOval(!centerOk);
 

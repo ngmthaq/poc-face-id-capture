@@ -2,11 +2,9 @@ import {
   ACCENT,
   STEPS,
   COUNTDOWN_MS,
-  OVAL_CX,
   OVAL_CY,
   OVAL_RX,
   OVAL_RY,
-  SVG_WIDTH,
   SVG_HEIGHT,
 } from "../constants";
 import { getCurveOffsets } from "../utils/curveOffsets";
@@ -18,6 +16,8 @@ interface SvgOverlayProps {
   matched: boolean;
   countdownActive: boolean;
   nosePos: { x: number; y: number } | null;
+  svgWidth: number;
+  ovalCx: number;
 }
 
 export default function SvgOverlay({
@@ -26,9 +26,13 @@ export default function SvgOverlay({
   matched,
   countdownActive,
   nosePos,
+  svgWidth,
+  ovalCx,
 }: SvgOverlayProps) {
   const step = STEPS[currentStep] ?? STEPS[0];
-  const tx = crosshairPos.x;
+  // Offset crosshair x from the original 400-wide coordinate system to the dynamic one
+  const xOffset = (svgWidth - 400) / 2;
+  const tx = crosshairPos.x + xOffset;
   const ty = crosshairPos.y;
   const crossColor = matched ? ACCENT : "rgba(255,255,255,0.22)";
   const crossGlow = matched ? `drop-shadow(0 0 8px ${ACCENT})` : "none";
@@ -36,15 +40,15 @@ export default function SvgOverlay({
 
   return (
     <svg
-      viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
+      viewBox={`0 0 ${svgWidth} ${SVG_HEIGHT}`}
       preserveAspectRatio="xMidYMid meet"
       style={S.svgOverlay}
     >
       <defs>
         <mask id="oval-mask">
-          <rect width={SVG_WIDTH} height={SVG_HEIGHT} fill="white" />
+          <rect width={svgWidth} height={SVG_HEIGHT} fill="white" />
           <ellipse
-            cx={OVAL_CX}
+            cx={ovalCx}
             cy={OVAL_CY}
             rx={OVAL_RX}
             ry={OVAL_RY}
@@ -55,7 +59,7 @@ export default function SvgOverlay({
 
       {/* dark overlay outside oval */}
       <rect
-        width={SVG_WIDTH}
+        width={svgWidth}
         height={SVG_HEIGHT}
         fill="rgba(11,13,15,0.72)"
         mask="url(#oval-mask)"
@@ -63,7 +67,7 @@ export default function SvgOverlay({
 
       {/* oval border — doubles as countdown */}
       <ellipse
-        cx={OVAL_CX}
+        cx={ovalCx}
         cy={OVAL_CY}
         rx={OVAL_RX}
         ry={OVAL_RY}
@@ -73,7 +77,7 @@ export default function SvgOverlay({
       />
       {countdownActive && (
         <ellipse
-          cx={OVAL_CX}
+          cx={ovalCx}
           cy={OVAL_CY}
           rx={OVAL_RX}
           ry={OVAL_RY}
@@ -99,7 +103,7 @@ export default function SvgOverlay({
         style={{ filter: crossGlow, transition: "all .4s ease" }}
       />
       <path
-        d={`M 0 ${ty} Q ${tx * 0.5} ${ty + hCurve} ${tx} ${ty} Q ${tx + (SVG_WIDTH - tx) * 0.5} ${ty + hCurve} ${SVG_WIDTH} ${ty}`}
+        d={`M 0 ${ty} Q ${tx * 0.5} ${ty + hCurve} ${tx} ${ty} Q ${tx + (svgWidth - tx) * 0.5} ${ty + hCurve} ${svgWidth} ${ty}`}
         fill="none"
         stroke={crossColor}
         strokeWidth="1.2"
