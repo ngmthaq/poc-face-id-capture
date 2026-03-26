@@ -1,6 +1,6 @@
 {
   "name": "@ngmthaq20/react-face-id-capture",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "React component for face registration with real-time face detection and multi-angle capture",
   "type": "module",
   "main": "dist/react-face-id-capture.cjs",
