@@ -7,6 +7,7 @@ export default {
     introStep2: "十字線に合わせて頭を動かしてください",
     introStep3: "カウントダウン中はじっとしてください",
     getStarted: "開始する",
+    back: "戻る",
 
     // Capture screen
     hudTitle: "顔登録",

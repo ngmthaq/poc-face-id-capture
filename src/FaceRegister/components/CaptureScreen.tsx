@@ -13,6 +13,7 @@ interface CaptureScreenProps {
   showFlash: boolean;
   outsideOval: boolean;
   maskWarning: boolean;
+  onBack?: () => void;
 }
 
 export default function CaptureScreen({
@@ -25,6 +26,7 @@ export default function CaptureScreen({
   showFlash,
   outsideOval,
   maskWarning,
+  onBack,
 }: CaptureScreenProps) {
   const { t } = useTranslation();
   const step = STEPS[currentStep] ?? STEPS[0];
@@ -43,6 +45,23 @@ export default function CaptureScreen({
 
       {/* HUD top */}
       <div style={S.hud}>
+        {onBack && (
+          <button style={S.captureBackBtn} onClick={onBack}>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 12H5" />
+              <path d="M12 19l-7-7 7-7" />
+            </svg>
+          </button>
+        )}
         <div style={S.hudTitle}>{t("faceRegister.hudTitle")}</div>
         <div style={S.hudProgress}>
           {t("faceRegister.hudProgress", {

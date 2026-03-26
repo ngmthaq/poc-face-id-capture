@@ -7,6 +7,7 @@ export default {
     introStep2: "Follow the crosshair by moving your head",
     introStep3: "Hold still during the countdown to capture",
     getStarted: "Get Started",
+    back: "Back",
 
     // Capture screen
     hudTitle: "Face Registration",
