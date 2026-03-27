@@ -1,5 +1,6 @@
 import { useRef, useCallback } from "react";
 import * as faceapi from "@vladmandic/face-api";
+
 import {
   STEPS,
   COUNTDOWN_MS,
@@ -32,6 +33,8 @@ interface DetectionCallbacks {
   captureFrame: () => string;
   stopCamera: () => void;
 }
+
+const isDev = import.meta.env.DEV;
 
 export function useFaceDetection(callbacks: DetectionCallbacks) {
   const loopRef = useRef<number>(0);
@@ -113,9 +116,11 @@ export function useFaceDetection(callbacks: DetectionCallbacks) {
               callbacks.setMaskWarning(false);
             }
 
-            console.log(
-              `[FaceReg] lipGap=${lipGap.toFixed(3)} mask=${maskConfirmed ? "yes" : "no"} (${maskFrames}/${MASK_THRESHOLD})`,
-            );
+            if (isDev) {
+              console.log(
+                `[FaceReg] lipGap=${lipGap.toFixed(3)} mask=${maskConfirmed ? "yes" : "no"} (${maskFrames}/${MASK_THRESHOLD})`,
+              );
+            }
 
             if (maskConfirmed) {
               callbacks.setNosePos(null);
@@ -140,9 +145,11 @@ export function useFaceDetection(callbacks: DetectionCallbacks) {
 
             const passes = centerOk && step.check(yaw, pitch, roll);
 
-            console.log(
-              `[FaceReg] step=${step.name} yaw=${yaw.toFixed(1)} pitch=${pitch.toFixed(1)} roll=${roll.toFixed(1)} centered=${isCentered} pass=${passes}`,
-            );
+            if (isDev) {
+              console.log(
+                `[FaceReg] step=${step.name} yaw=${yaw.toFixed(1)} pitch=${pitch.toFixed(1)} roll=${roll.toFixed(1)} centered=${isCentered} pass=${passes}`,
+              );
+            }
 
             if (passes) {
               missCount = 0;

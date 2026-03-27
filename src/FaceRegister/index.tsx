@@ -126,7 +126,7 @@ export default function FaceRegister({
   const handleSave = useCallback(() => {
     if (onComplete) {
       onComplete(captures);
-    } else {
+    } else if (import.meta.env.DEV) {
       console.log("Face registration captures:", captures);
     }
   }, [captures, onComplete]);
