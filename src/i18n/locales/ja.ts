@@ -15,11 +15,11 @@ export default {
 
     // Step instructions
     stepCenter: "正面を向いてください",
+    stepTop: "顔を上に向けてください",
+    stepTopLeft: "顔を左上に向けてください",
+    stepTopRight: "顔を右上に向けてください",
     stepLeft: "顔を左に向けてください",
     stepRight: "顔を右に向けてください",
-    stepUp: "顔を上に向けてください",
-    stepDown: "顔を下に向けてください",
-    stepTilt: "頭を横に傾けてください",
 
     // Warnings
     outsideOval: "楕円の中に顔を移動してください",
@@ -28,11 +28,11 @@ export default {
 
     // Step labels
     labelCenter: "正面",
+    labelTop: "上",
+    labelTopLeft: "左上",
+    labelTopRight: "右上",
     labelLeft: "左",
     labelRight: "右",
-    labelUp: "上",
-    labelDown: "下",
-    labelTilt: "傾き",
 
     // Result screen
     resultTitle: "登録完了",

@@ -15,11 +15,11 @@ export default {
 
     // Step instructions
     stepCenter: "Look straight ahead",
+    stepTop: "Tilt your face up",
+    stepTopLeft: "Tilt your face up and left",
+    stepTopRight: "Tilt your face up and right",
     stepLeft: "Turn your face left",
     stepRight: "Turn your face right",
-    stepUp: "Tilt your face up",
-    stepDown: "Tilt your face down",
-    stepTilt: "Tilt your head sideways",
 
     // Warnings
     outsideOval: "Move your face into the oval",
@@ -28,11 +28,11 @@ export default {
 
     // Step labels
     labelCenter: "Center",
+    labelTop: "Top",
+    labelTopLeft: "Top Left",
+    labelTopRight: "Top Right",
     labelLeft: "Left",
     labelRight: "Right",
-    labelUp: "Up",
-    labelDown: "Down",
-    labelTilt: "Tilt",
 
     // Result screen
     resultTitle: "Registration Complete",

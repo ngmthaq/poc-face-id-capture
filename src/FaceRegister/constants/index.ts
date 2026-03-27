@@ -1,4 +1,4 @@
-export type StepName = "center" | "left" | "right" | "up" | "down" | "tilt";
+export type StepName = "center" | "top" | "topLeft" | "topRight" | "left" | "right";
 export type Screen = "intro" | "capture" | "result";
 
 export interface Capture {
@@ -26,20 +26,20 @@ export interface FaceRegisterTranslations {
   hudTitle?: string;
   hudProgress?: string;
   stepCenter?: string;
+  stepTop?: string;
+  stepTopLeft?: string;
+  stepTopRight?: string;
   stepLeft?: string;
   stepRight?: string;
-  stepUp?: string;
-  stepDown?: string;
-  stepTilt?: string;
   outsideOval?: string;
   maskWarning?: string;
   maskWarningDetail?: string;
   labelCenter?: string;
+  labelTop?: string;
+  labelTopLeft?: string;
+  labelTopRight?: string;
   labelLeft?: string;
   labelRight?: string;
-  labelUp?: string;
-  labelDown?: string;
-  labelTilt?: string;
   resultTitle?: string;
   resultSub?: string;
   registerAgain?: string;
@@ -66,6 +66,27 @@ export const STEPS: StepDef[] = [
       Math.abs(y) < 12 && Math.abs(p) < 12 && Math.abs(r) < 12,
   },
   {
+    name: "top",
+    labelKey: "faceRegister.labelTop",
+    instructionKey: "faceRegister.stepTop",
+    target: { x: 200, y: 230 },
+    check: (_y, p) => p < -3,
+  },
+  {
+    name: "topLeft",
+    labelKey: "faceRegister.labelTopLeft",
+    instructionKey: "faceRegister.stepTopLeft",
+    target: { x: 120, y: 230 },
+    check: (y, p) => y > 10 && p < -3,
+  },
+  {
+    name: "topRight",
+    labelKey: "faceRegister.labelTopRight",
+    instructionKey: "faceRegister.stepTopRight",
+    target: { x: 280, y: 230 },
+    check: (y, p) => y < -10 && p < -3,
+  },
+  {
     name: "left",
     labelKey: "faceRegister.labelLeft",
     instructionKey: "faceRegister.stepLeft",
@@ -78,27 +99,6 @@ export const STEPS: StepDef[] = [
     instructionKey: "faceRegister.stepRight",
     target: { x: 280, y: 300 },
     check: (y) => y < -10,
-  },
-  {
-    name: "up",
-    labelKey: "faceRegister.labelUp",
-    instructionKey: "faceRegister.stepUp",
-    target: { x: 200, y: 230 },
-    check: (_y, p) => p < -3,
-  },
-  {
-    name: "down",
-    labelKey: "faceRegister.labelDown",
-    instructionKey: "faceRegister.stepDown",
-    target: { x: 200, y: 380 },
-    check: (_y, p) => p > 4,
-  },
-  {
-    name: "tilt",
-    labelKey: "faceRegister.labelTilt",
-    instructionKey: "faceRegister.stepTilt",
-    target: { x: 148, y: 250 },
-    check: (_y, _p, r) => Math.abs(r) > 3,
   },
 ];
 
