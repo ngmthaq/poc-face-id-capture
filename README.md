@@ -1,6 +1,6 @@
 # @ngmthaq20/react-face-id-capture
 
-React component for face registration with real-time face detection and multi-angle capture. Guides users through capturing 6 face poses (center, left, right, up, down, tilt) using AI-powered face detection.
+React component for face registration with real-time face detection and multi-angle capture. Guides users through capturing 6 face poses (center, top, top-left, top-right, left, right) using AI-powered face detection.
 
 ## Installation
 
@@ -27,7 +27,8 @@ function App() {
       onComplete={(captures) => {
         // captures: array of 6 face images
         captures.forEach((c) => {
-          console.log(c.step); // "center" | "left" | "right" | "up" | "down" | "tilt"
+          console.log(c.step); // "center" | "top" | "topLeft" | "topRight" | "left" | "right"
+          console.log(c.labelKey); // translation key for the step label
           console.log(c.data); // base64 JPEG data URL
         });
       }}
@@ -44,17 +45,17 @@ function App() {
 
 | Prop           | Type                            | Description                                                                     |
 | -------------- | ------------------------------- | ------------------------------------------------------------------------------- |
-| `onComplete`   | `(captures: Capture[]) => void` | Called when all 6 face images are captured and user taps "Save & Continue"      |
-| `onExit`       | `() => void`                    | Called when user taps back on intro screen or "Discard & Exit" on result screen |
-| `locale`       | `string`                        | Override the active language (`"en"`, `"ja"`, or custom)                        |
-| `translations` | `FaceRegisterTranslations`      | Override or extend translation strings                                          |
+| `onComplete`   | `(captures: Capture[]) => void` | Called when all 6 face images are captured and user taps "Save & Continue"       |
+| `onExit`       | `() => void`                    | Called when user taps back on intro screen or "Discard & Exit" on result screen  |
+| `locale`       | `string`                        | Override the active language (`"en"`, `"ja"`, or custom)                         |
+| `translations` | `FaceRegisterTranslations`      | Override or extend translation strings                                           |
 
 ## Capture Object
 
 ```ts
 interface Capture {
-  step: "center" | "left" | "right" | "up" | "down" | "tilt";
-  labelKey: string;
+  step: "center" | "top" | "topLeft" | "topRight" | "left" | "right";
+  labelKey: string; // i18n key for the step label (e.g. "faceRegister.labelCenter")
   data: string; // base64 JPEG data URL
 }
 ```
@@ -111,14 +112,20 @@ Built-in languages: English (`en`) and Japanese (`ja`).
 | `hudTitle`          | Face Registration                           |
 | `hudProgress`       | {{current}} / {{total}}                     |
 | `stepCenter`        | Look straight ahead                         |
+| `stepTop`           | Tilt your face up                           |
+| `stepTopLeft`       | Tilt your face up and left                  |
+| `stepTopRight`      | Tilt your face up and right                 |
 | `stepLeft`          | Turn your face left                         |
 | `stepRight`         | Turn your face right                        |
-| `stepUp`            | Tilt your face up                           |
-| `stepDown`          | Tilt your face down                         |
-| `stepTilt`          | Tilt your head sideways                     |
 | `outsideOval`       | Move your face into the oval                |
 | `maskWarning`       | We need to see your full face               |
 | `maskWarningDetail` | Make sure nothing is covering your face     |
+| `labelCenter`       | Center                                      |
+| `labelTop`          | Top                                         |
+| `labelTopLeft`      | Top Left                                    |
+| `labelTopRight`     | Top Right                                   |
+| `labelLeft`         | Left                                        |
+| `labelRight`        | Right                                       |
 | `resultTitle`       | Registration Complete                       |
 | `resultSub`         | {{count}} face images captured successfully |
 | `registerAgain`     | Register Again                              |
