@@ -6,6 +6,7 @@ import {
   OVAL_RX,
   OVAL_RY,
   SVG_HEIGHT,
+  STEP_ANGLES,
 } from "../constants";
 import { getCurveOffsets } from "../utils/curveOffsets";
 import { S } from "../styles";
@@ -20,6 +21,15 @@ interface SvgOverlayProps {
   ovalCx: number;
 }
 
+/** Approximate ellipse perimeter (must match countdown dasharray). */
+const PERIMETER = 865;
+
+function getArcColor(proximity: number): string {
+  if (proximity >= 0.7) return ACCENT;
+  if (proximity >= 0.3) return "#ffd666";
+  return "rgba(255,255,255,0.25)";
+}
+
 export default function SvgOverlay({
   currentStep,
   crosshairPos,
@@ -30,13 +40,44 @@ export default function SvgOverlay({
   ovalCx,
 }: SvgOverlayProps) {
   const step = STEPS[currentStep] ?? STEPS[0];
-  // Offset crosshair x from the original 400-wide coordinate system to the dynamic one
   const xOffset = (svgWidth - 400) / 2;
   const tx = crosshairPos.x + xOffset;
   const ty = crosshairPos.y;
   const crossColor = matched ? ACCENT : "rgba(255,255,255,0.22)";
   const crossGlow = matched ? `drop-shadow(0 0 8px ${ACCENT})` : "none";
   const { vCurve, hCurve } = getCurveOffsets(step.name);
+
+  const angleDeg = STEP_ANGLES[step.name];
+  const hasDirection = angleDeg !== null;
+  const angleRad = hasDirection ? (angleDeg * Math.PI) / 180 : 0;
+
+  // --- Proximity calculation ---
+  const maxDist = 120;
+  let proximity = 0;
+  if (nosePos) {
+    const dx = nosePos.x - tx;
+    const dy = nosePos.y - ty;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    proximity = Math.max(0, 1 - dist / maxDist);
+  }
+
+  // --- Chevron position on oval edge ---
+  const chevronX = hasDirection
+    ? ovalCx + (OVAL_RX - 16) * Math.cos(angleRad)
+    : 0;
+  const chevronY = hasDirection
+    ? OVAL_CY + (OVAL_RY - 16) * Math.sin(angleRad)
+    : 0;
+
+  // --- Proximity arc ---
+  const arcLength = hasDirection ? proximity * 216 : 0;
+  const arcRotation = hasDirection
+    ? -(angleDeg / 360) * PERIMETER + arcLength / 2
+    : 0;
+  const arcColor = getArcColor(proximity);
+
+  // --- Center step: full-oval glow proportional to proximity ---
+  const centerGlowOpacity = !hasDirection ? proximity * 0.6 : 0;
 
   return (
     <svg
@@ -65,7 +106,7 @@ export default function SvgOverlay({
         mask="url(#oval-mask)"
       />
 
-      {/* oval border — doubles as countdown */}
+      {/* oval border */}
       <ellipse
         cx={ovalCx}
         cy={OVAL_CY}
@@ -75,6 +116,8 @@ export default function SvgOverlay({
         stroke="rgba(255,255,255,0.25)"
         strokeWidth="1.5"
       />
+
+      {/* countdown ring */}
       {countdownActive && (
         <ellipse
           cx={ovalCx}
@@ -84,12 +127,72 @@ export default function SvgOverlay({
           fill="none"
           stroke={ACCENT}
           strokeWidth="3"
-          strokeDasharray="865"
-          strokeDashoffset="865"
+          strokeDasharray={String(PERIMETER)}
+          strokeDashoffset={String(PERIMETER)}
           strokeLinecap="round"
           style={{
             animation: `fr-countdown-ring ${STEPS[currentStep]?.countdown ?? COUNTDOWN_MS}ms linear forwards`,
             filter: `drop-shadow(0 0 6px ${ACCENT})`,
+          }}
+        />
+      )}
+
+      {/* --- Center step: full oval proximity glow --- */}
+      {!hasDirection && nosePos && centerGlowOpacity > 0.05 && (
+        <ellipse
+          cx={ovalCx}
+          cy={OVAL_CY}
+          rx={OVAL_RX}
+          ry={OVAL_RY}
+          fill="none"
+          stroke={matched ? ACCENT : "#ffd666"}
+          strokeWidth="2.5"
+          opacity={centerGlowOpacity}
+          style={{
+            transition: "opacity 0.25s ease, stroke 0.3s ease",
+            filter: matched ? `drop-shadow(0 0 8px ${ACCENT})` : "none",
+          }}
+        />
+      )}
+
+      {/* --- Proximity arc (non-center steps) --- */}
+      {hasDirection && nosePos && proximity > 0.05 && (
+        <ellipse
+          cx={ovalCx}
+          cy={OVAL_CY}
+          rx={OVAL_RX}
+          ry={OVAL_RY}
+          fill="none"
+          stroke={arcColor}
+          strokeWidth="3"
+          strokeDasharray={`${arcLength} ${PERIMETER - arcLength}`}
+          strokeDashoffset={String(arcRotation)}
+          strokeLinecap="round"
+          style={{
+            transition:
+              "stroke-dasharray 0.2s ease, stroke 0.3s ease, stroke-dashoffset 0.15s ease",
+            filter:
+              proximity > 0.7 ? `drop-shadow(0 0 6px ${ACCENT})` : "none",
+          }}
+        />
+      )}
+
+      {/* --- Directional chevron (non-center steps) --- */}
+      {hasDirection && (
+        <path
+          d={`M -7,-5 L 0,0 L -7,5`}
+          fill="none"
+          stroke={matched ? ACCENT : "rgba(255,255,255,0.55)"}
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          transform={`translate(${chevronX},${chevronY}) rotate(${angleDeg})`}
+          style={{
+            transition: "stroke 0.3s ease, filter 0.3s ease",
+            filter: matched ? `drop-shadow(0 0 6px ${ACCENT})` : "none",
+            animation: matched
+              ? "none"
+              : "fr-chevron-pulse 1.8s ease-in-out infinite",
           }}
         />
       )}

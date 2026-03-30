@@ -20,6 +20,7 @@ export const injectStyles = () => {
       100% { stroke-dashoffset: 0; }
     }
     @keyframes fr-spin { to { transform: rotate(360deg); } }
+    @keyframes fr-chevron-pulse { 0%,100%{opacity:.5} 50%{opacity:1} }
   `;
   document.head.appendChild(style);
 };
