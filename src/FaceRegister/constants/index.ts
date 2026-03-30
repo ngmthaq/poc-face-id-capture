@@ -70,35 +70,35 @@ export const STEPS: StepDef[] = [
     labelKey: "faceRegister.labelTop",
     instructionKey: "faceRegister.stepTop",
     target: { x: 200, y: 260 },
-    check: (_y, p) => p < -3,
+    check: (_y, p) => p < -3 && p > -18 && Math.abs(_y) < 15,
   },
   {
     name: "topLeft",
     labelKey: "faceRegister.labelTopLeft",
     instructionKey: "faceRegister.stepTopLeft",
     target: { x: 160, y: 260 },
-    check: (y, p) => y > 5 && p < -2,
+    check: (y, p) => y > 3 && y < 18 && p < -2 && p > -18,
   },
   {
     name: "topRight",
     labelKey: "faceRegister.labelTopRight",
     instructionKey: "faceRegister.stepTopRight",
     target: { x: 240, y: 260 },
-    check: (y, p) => y < -5 && p < -2,
+    check: (y, p) => y < -3 && y > -18 && p < -2 && p > -18,
   },
   {
     name: "left",
     labelKey: "faceRegister.labelLeft",
     instructionKey: "faceRegister.stepLeft",
     target: { x: 160, y: 300 },
-    check: (y) => y > 5,
+    check: (y, p) => y > 3 && y < 18 && Math.abs(p) < 15,
   },
   {
     name: "right",
     labelKey: "faceRegister.labelRight",
     instructionKey: "faceRegister.stepRight",
     target: { x: 240, y: 300 },
-    check: (y) => y < -5,
+    check: (y, p) => y < -3 && y > -18 && Math.abs(p) < 15,
   },
 ];
 
@@ -114,5 +114,5 @@ export const OVAL_CY = 270;
 export const OVAL_RX = 130;
 export const OVAL_RY = 170;
 export const MISS_GRACE = 3;
-export const MASK_THRESHOLD = 5;
+export const MASK_THRESHOLD = 10;
 export const FACE_CENTER_Y = 320;

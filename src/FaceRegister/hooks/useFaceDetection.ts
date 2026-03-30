@@ -15,6 +15,7 @@ import {
   calcRoll,
   toSvgCoords,
   checkFaceCentered,
+  checkNoseInRing,
   checkMask,
   getSvgDims,
 } from "../utils/faceCalculations";
@@ -143,11 +144,17 @@ export function useFaceDetection(callbacks: DetectionCallbacks) {
             const centerOk = step.name === "center" ? isCentered : true;
             callbacks.setOutsideOval(!centerOk);
 
-            const passes = centerOk && step.check(yaw, pitch, roll);
+            // Nose must be inside the double-ring crosshair for non-center steps
+            const noseInRing =
+              step.name === "center"
+                ? true
+                : checkNoseInRing(svgPos, step.target, dims.svgWidth);
+
+            const passes = centerOk && noseInRing && step.check(yaw, pitch, roll);
 
             if (isDev) {
               console.log(
-                `[FaceReg] step=${step.name} yaw=${yaw.toFixed(1)} pitch=${pitch.toFixed(1)} roll=${roll.toFixed(1)} centered=${isCentered} pass=${passes}`,
+                `[FaceReg] step=${step.name} yaw=${yaw.toFixed(1)} pitch=${pitch.toFixed(1)} roll=${roll.toFixed(1)} centered=${isCentered} noseInRing=${noseInRing} pass=${passes}`,
               );
             }
 

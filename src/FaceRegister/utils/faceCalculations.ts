@@ -89,11 +89,31 @@ export function checkFaceCentered(
   return offCenterX < 30 && offCenterY < 40;
 }
 
+/**
+ * Check whether the nose position (SVG coords) is inside the double-ring
+ * crosshair area centered at the step target.
+ */
+export function checkNoseInRing(
+  nosePos: Point,
+  target: Point,
+  svgWidth: number,
+  ringRadius: number = 35,
+): boolean {
+  // Apply the same x-offset used by SvgOverlay to map the 400-wide
+  // coordinate system to the dynamic SVG width.
+  const xOffset = (svgWidth - 400) / 2;
+  const tx = target.x + xOffset;
+  const ty = target.y;
+  const dx = nosePos.x - tx;
+  const dy = nosePos.y - ty;
+  return dx * dx + dy * dy <= ringRadius * ringRadius;
+}
+
 export function checkMask(
   upperLipY: number,
   lowerLipY: number,
   faceHeight: number,
 ): boolean {
   const lipGap = Math.abs(lowerLipY - upperLipY) / faceHeight;
-  return lipGap < 0.10;
+  return lipGap < 0.105;
 }
