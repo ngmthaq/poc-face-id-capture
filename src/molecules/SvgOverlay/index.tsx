@@ -62,18 +62,12 @@ export default function SvgOverlay({
   }
 
   // --- Chevron position on oval edge ---
-  const chevronX = hasDirection
-    ? ovalCx + (OVAL_RX - 16) * Math.cos(angleRad)
-    : 0;
-  const chevronY = hasDirection
-    ? OVAL_CY + (OVAL_RY - 16) * Math.sin(angleRad)
-    : 0;
+  const chevronX = hasDirection ? ovalCx + (OVAL_RX - 16) * Math.cos(angleRad) : 0;
+  const chevronY = hasDirection ? OVAL_CY + (OVAL_RY - 16) * Math.sin(angleRad) : 0;
 
   // --- Proximity arc ---
   const arcLength = hasDirection ? proximity * 216 : 0;
-  const arcRotation = hasDirection
-    ? -(angleDeg / 360) * PERIMETER + arcLength / 2
-    : 0;
+  const arcRotation = hasDirection ? -(angleDeg / 360) * PERIMETER + arcLength / 2 : 0;
   const arcColor = getArcColor(proximity);
 
   // --- Center step: full-oval glow proportional to proximity ---
@@ -85,38 +79,6 @@ export default function SvgOverlay({
       preserveAspectRatio="xMidYMid meet"
       style={S.svgOverlay}
     >
-      <defs>
-        <mask id="oval-mask">
-          <rect width={svgWidth} height={SVG_HEIGHT} fill="white" />
-          <ellipse
-            cx={ovalCx}
-            cy={OVAL_CY}
-            rx={OVAL_RX}
-            ry={OVAL_RY}
-            fill="black"
-          />
-        </mask>
-      </defs>
-
-      {/* dark overlay outside oval */}
-      <rect
-        width={svgWidth}
-        height={SVG_HEIGHT}
-        fill="rgba(11,13,15,0.72)"
-        mask="url(#oval-mask)"
-      />
-
-      {/* oval border */}
-      <ellipse
-        cx={ovalCx}
-        cy={OVAL_CY}
-        rx={OVAL_RX}
-        ry={OVAL_RY}
-        fill="none"
-        stroke="rgba(255,255,255,0.25)"
-        strokeWidth="1.5"
-      />
-
       {/* countdown ring */}
       {countdownActive && (
         <ellipse
@@ -171,8 +133,7 @@ export default function SvgOverlay({
           style={{
             transition:
               "stroke-dasharray 0.2s ease, stroke 0.3s ease, stroke-dashoffset 0.15s ease",
-            filter:
-              proximity > 0.7 ? `drop-shadow(0 0 6px ${ACCENT})` : "none",
+            filter: proximity > 0.7 ? `drop-shadow(0 0 6px ${ACCENT})` : "none",
           }}
         />
       )}
@@ -190,9 +151,7 @@ export default function SvgOverlay({
           style={{
             transition: "stroke 0.3s ease, filter 0.3s ease",
             filter: matched ? `drop-shadow(0 0 6px ${ACCENT})` : "none",
-            animation: matched
-              ? "none"
-              : "fr-chevron-pulse 1.8s ease-in-out infinite",
+            animation: matched ? "none" : "fr-chevron-pulse 1.8s ease-in-out infinite",
           }}
         />
       )}

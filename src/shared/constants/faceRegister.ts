@@ -17,8 +17,7 @@ export const STEPS: StepDef[] = [
     labelKey: "faceRegister.labelCenter",
     instructionKey: "faceRegister.stepCenter",
     target: { x: 200, y: 280 },
-    check: (y, p, r) =>
-      Math.abs(y) < 12 && Math.abs(p) < 12 && Math.abs(r) < 12,
+    check: (y, p, r) => Math.abs(y) < 12 && Math.abs(p) < 12 && Math.abs(r) < 12,
   },
   {
     name: "top",
@@ -67,11 +66,10 @@ export const STEP_ANGLES: Record<StepName, number | null> = {
   right: 0,
 };
 
-export const ACCENT = "#4fffb0";
-export const BG = "#0b0d0f";
+export const ACCENT = "#4f9fff";
+export const BG = "#4a4d51";
 export const COUNTDOWN_MS = 1000;
-export const MODEL_URL =
-  "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model";
+export const MODEL_URL = "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model";
 export const SVG_WIDTH = 400;
 export const SVG_HEIGHT = 600;
 export const OVAL_CX = 200;

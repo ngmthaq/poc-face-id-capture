@@ -1,6 +1,6 @@
 {
   "name": "@ngmthaq20/react-face-id-capture",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "React component for face registration with real-time face detection and multi-angle capture",
   "type": "module",
   "main": "dist/react-face-id-capture.cjs",
@@ -47,7 +47,13 @@
     "build": "tsc -b && vite build",
     "build:lib": "vite build && tsc -p tsconfig.build.json",
     "preview": "vite preview",
-    "prepublishOnly": "npm run build:lib"
+    "prepublishOnly": "npm run build:lib",
+    "prepare": "husky",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,json,css,md,html}": "prettier --write"
   },
   "peerDependencies": {
     "i18next": ">=23.0.0",
@@ -72,7 +78,10 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-basic-ssl": "^2.3.0",
     "@vitejs/plugin-react": "^4.5.2",
+    "husky": "^9.1.7",
     "i18next": "^25.10.9",
+    "lint-staged": "^17.0.4",
+    "prettier": "^3.8.3",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-i18next": "^16.6.6",
