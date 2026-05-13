@@ -6,8 +6,8 @@ import {
   COUNTDOWN_MS,
   MISS_GRACE,
   MASK_THRESHOLD,
-  type Capture,
-} from "../constants";
+} from "../constants/faceRegister";
+import type { Capture } from "../types/faceRegister";
 import {
   getEyeCenter,
   calcYaw,

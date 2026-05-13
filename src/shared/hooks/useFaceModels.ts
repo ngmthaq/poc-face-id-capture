@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import * as faceapi from "@vladmandic/face-api";
-import { MODEL_URL } from "../constants";
+import { MODEL_URL } from "../constants/faceRegister";
 
 export function useFaceModels() {
   const [modelsLoaded, setModelsLoaded] = useState(false);

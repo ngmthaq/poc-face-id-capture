@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { S } from "../styles";
+import { S } from "../../shared/styles/faceRegister";
 
 export default function LoadingOverlay() {
   const { t } = useTranslation();

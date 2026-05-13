@@ -1,7 +1,7 @@
 import {
   SVG_HEIGHT,
   FACE_CENTER_Y,
-} from "../constants";
+} from "../constants/faceRegister";
 
 interface Point {
   x: number;

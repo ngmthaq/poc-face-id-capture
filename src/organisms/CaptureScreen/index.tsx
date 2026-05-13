@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
-import { ACCENT, STEPS } from "../constants";
-import { S } from "../styles";
-import SvgOverlay from "./SvgOverlay";
+import { ACCENT, STEPS } from "../../shared/constants/faceRegister";
+import { S } from "../../shared/styles/faceRegister";
+import SvgOverlay from "../../molecules/SvgOverlay";
 
 interface CaptureScreenProps {
   videoRef: React.RefObject<HTMLVideoElement | null>;

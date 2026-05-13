@@ -2,7 +2,7 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import en from "./locales/en";
 import ja from "./locales/ja";
-import type { FaceRegisterTranslations } from "../FaceRegister/constants";
+import type { FaceRegisterTranslations } from "../types/faceRegister";
 
 const builtInResources: Record<string, { faceRegister: Record<string, string> }> = {
   en,

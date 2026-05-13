@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { ACCENT } from "../constants";
-import { S } from "../styles";
+import { ACCENT } from "../../shared/constants/faceRegister";
+import { S } from "../../shared/styles/faceRegister";
 
 interface IntroScreenProps {
   onStart: () => void;

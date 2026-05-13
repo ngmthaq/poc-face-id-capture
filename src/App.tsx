@@ -1,4 +1,4 @@
-import FaceRegister from "./FaceRegister";
+import FaceRegister from "./templates/FaceRegister";
 
 export default function App() {
   return (

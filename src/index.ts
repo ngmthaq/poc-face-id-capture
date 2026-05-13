@@ -1,7 +1,7 @@
-export { default as FaceRegister } from "./FaceRegister";
+export { default as FaceRegister } from "./templates/FaceRegister";
 export type {
   Capture,
   FaceRegisterProps,
   FaceRegisterTranslations,
-} from "./FaceRegister";
-export type { StepName } from "./FaceRegister/constants";
+} from "./templates/FaceRegister";
+export type { StepName } from "./shared/types/faceRegister";

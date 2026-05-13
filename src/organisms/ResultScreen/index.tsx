@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
-import { ACCENT, type Capture } from "../constants";
-import { S } from "../styles";
+import { ACCENT } from "../../shared/constants/faceRegister";
+import type { Capture } from "../../shared/types/faceRegister";
+import { S } from "../../shared/styles/faceRegister";
 
 interface ResultScreenProps {
   captures: Capture[];

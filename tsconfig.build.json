@@ -14,5 +14,12 @@
     "outDir": "dist",
     "isolatedModules": true
   },
-  "include": ["src/index.ts", "src/FaceRegister/**/*", "src/i18n/**/*"]
+  "include": [
+    "src/index.ts",
+    "src/templates/**/*",
+    "src/organisms/**/*",
+    "src/molecules/**/*",
+    "src/atoms/**/*",
+    "src/shared/**/*"
+  ]
 }

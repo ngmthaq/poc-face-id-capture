@@ -1,4 +1,4 @@
-import type { StepName } from "../constants";
+import type { StepName } from "../types/faceRegister";
 
 const CURVE_AMOUNT = 30;
 

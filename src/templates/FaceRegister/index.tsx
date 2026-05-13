@@ -4,21 +4,22 @@ import {
   SVG_WIDTH,
   OVAL_CX,
   type Screen,
-  type Capture,
-  type FaceRegisterProps,
-  type FaceRegisterTranslations,
-} from "./constants";
-import { ensureI18n } from "../i18n";
-import { injectStyles } from "./styles";
-import { S } from "./styles";
-import { useCamera } from "./hooks/useCamera";
-import { useFaceModels } from "./hooks/useFaceModels";
-import { useFaceDetection } from "./hooks/useFaceDetection";
-import { getSvgDims } from "./utils/faceCalculations";
-import IntroScreen from "./components/IntroScreen";
-import CaptureScreen from "./components/CaptureScreen";
-import ResultScreen from "./components/ResultScreen";
-import LoadingOverlay from "./components/LoadingOverlay";
+} from "../../shared/constants/faceRegister";
+import type {
+  Capture,
+  FaceRegisterProps,
+  FaceRegisterTranslations,
+} from "../../shared/types/faceRegister";
+import { ensureI18n } from "../../shared/i18n";
+import { injectStyles, S } from "../../shared/styles/faceRegister";
+import { useCamera } from "../../shared/hooks/useCamera";
+import { useFaceModels } from "../../shared/hooks/useFaceModels";
+import { useFaceDetection } from "../../shared/hooks/useFaceDetection";
+import { getSvgDims } from "../../shared/utils/faceCalculations";
+import IntroScreen from "../../organisms/IntroScreen";
+import CaptureScreen from "../../organisms/CaptureScreen";
+import ResultScreen from "../../organisms/ResultScreen";
+import LoadingOverlay from "../../molecules/LoadingOverlay";
 
 export type { Capture, FaceRegisterProps, FaceRegisterTranslations };
 

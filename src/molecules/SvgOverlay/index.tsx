@@ -7,9 +7,9 @@ import {
   OVAL_RY,
   SVG_HEIGHT,
   STEP_ANGLES,
-} from "../constants";
-import { getCurveOffsets } from "../utils/curveOffsets";
-import { S } from "../styles";
+} from "../../shared/constants/faceRegister";
+import { getCurveOffsets } from "../../shared/utils/curveOffsets";
+import { S } from "../../shared/styles/faceRegister";
 
 interface SvgOverlayProps {
   currentStep: number;
