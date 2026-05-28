@@ -44,7 +44,11 @@ export default function FaceRegister({
   const [crosshairPos, setCrosshairPos] = useState(STEPS[0].target);
   const [nosePos, setNosePos] = useState<{ x: number; y: number } | null>(null);
 
-  const bundle = useMemo(() => resolveTranslations(locale, translations), [locale, translations]);
+  const bundle = useMemo(() => {
+    const response = resolveTranslations(locale, translations);
+    console.log("bundle", response);
+    return response;
+  }, [locale, translations]);
 
   useEffect(() => {
     injectStyles();
