@@ -44,4 +44,10 @@ export interface FaceRegisterProps {
   onExit?: () => void;
   locale?: string;
   translations?: FaceRegisterTranslations;
+  /**
+   * Enables verbose `[i18n-debug]` console logging across the i18n pipeline and the three
+   * organism screens. Default is `true`. Consumers should set this to `false` in production
+   * to silence the debug output.
+   */
+  enableDebug?: boolean;
 }

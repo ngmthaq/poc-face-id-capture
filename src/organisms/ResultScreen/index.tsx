@@ -9,10 +9,26 @@ interface ResultScreenProps {
   onReset: () => void;
   onSave: () => void;
   onExit?: () => void;
+  enableDebug?: boolean;
 }
 
-export default function ResultScreen({ captures, onReset, onSave, onExit }: ResultScreenProps) {
+export default function ResultScreen({
+  captures,
+  onReset,
+  onSave,
+  onExit,
+  enableDebug = true,
+}: ResultScreenProps) {
   const { t } = useTranslation(undefined, { i18n: libraryI18n });
+
+  if (enableDebug) {
+    console.log("[i18n-debug][ResultScreen:render]", {
+      language: libraryI18n.language,
+      resultTitle: t("faceRegister.resultTitle"),
+      resultSub: t("faceRegister.resultSub", { count: captures.length }),
+      captureCount: captures.length,
+    });
+  }
 
   return (
     <div style={S.result}>

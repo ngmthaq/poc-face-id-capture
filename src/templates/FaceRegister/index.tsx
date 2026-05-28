@@ -5,7 +5,7 @@ import type {
   FaceRegisterProps,
   FaceRegisterTranslations,
 } from "../../shared/types/faceRegister";
-import { applyI18nConfig } from "../../shared/i18n";
+import { applyI18nConfig, libraryI18n, setI18nDebugEnabled } from "../../shared/i18n";
 import { injectStyles, S } from "../../shared/styles/faceRegister";
 import { useCamera } from "../../shared/hooks/useCamera";
 import { useFaceModels } from "../../shared/hooks/useFaceModels";
@@ -23,6 +23,7 @@ export default function FaceRegister({
   onExit,
   locale,
   translations,
+  enableDebug = true,
 }: FaceRegisterProps) {
   const { videoRef, canvasRef, videoDims, startCamera, stopCamera, captureFrame } = useCamera();
 
@@ -45,12 +46,32 @@ export default function FaceRegister({
 
   const i18nConfigRef = useRef(false);
   if (!i18nConfigRef.current) {
+    if (enableDebug) {
+      console.log("[i18n-debug][FaceRegister:firstRender:before]", { locale, translations });
+    }
+    setI18nDebugEnabled(enableDebug);
     applyI18nConfig(locale, translations);
+    if (enableDebug) {
+      console.log("[i18n-debug][FaceRegister:firstRender:after]", {
+        language: libraryI18n.language,
+        introStep1: libraryI18n.t("faceRegister.introStep1"),
+      });
+    }
     i18nConfigRef.current = true;
   }
 
   useLayoutEffect(() => {
+    if (enableDebug) {
+      console.log("[i18n-debug][FaceRegister:layoutEffect:before]", { locale, translations });
+    }
+    setI18nDebugEnabled(enableDebug);
     applyI18nConfig(locale, translations);
+    if (enableDebug) {
+      console.log("[i18n-debug][FaceRegister:layoutEffect:after]", {
+        language: libraryI18n.language,
+        introStep1: libraryI18n.t("faceRegister.introStep1"),
+      });
+    }
   }, [locale, translations]);
 
   useEffect(() => {
@@ -145,7 +166,9 @@ export default function FaceRegister({
 
       {loading && <LoadingOverlay />}
 
-      {screen === "intro" && <IntroScreen onStart={handleStart} onExit={onExit} />}
+      {screen === "intro" && (
+        <IntroScreen onStart={handleStart} onExit={onExit} enableDebug={enableDebug} />
+      )}
 
       {screen === "capture" && (
         <CaptureScreen
@@ -161,6 +184,7 @@ export default function FaceRegister({
           onBack={handleReset}
           svgWidth={svgDims.svgWidth}
           ovalCx={svgDims.ovalCx}
+          enableDebug={enableDebug}
         />
       )}
 
@@ -170,6 +194,7 @@ export default function FaceRegister({
           onReset={handleReset}
           onSave={handleSave}
           onExit={onExit}
+          enableDebug={enableDebug}
         />
       )}
     </div>
