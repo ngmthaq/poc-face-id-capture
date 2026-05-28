@@ -16,20 +16,12 @@ export default defineConfig({
       fileName: "react-face-id-capture",
     },
     rollupOptions: {
-      external: [
-        "react",
-        "react-dom",
-        "react/jsx-runtime",
-        "i18next",
-        "react-i18next",
-      ],
+      external: ["react", "react-dom", "react/jsx-runtime"],
       output: {
         globals: {
           react: "React",
           "react-dom": "ReactDOM",
           "react/jsx-runtime": "jsxRuntime",
-          i18next: "i18next",
-          "react-i18next": "reactI18next",
         },
       },
     },

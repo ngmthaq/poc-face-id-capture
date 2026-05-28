@@ -1,27 +1,14 @@
-import { useTranslation } from "react-i18next";
 import { ACCENT } from "../../shared/constants/faceRegister";
-import { libraryI18n } from "../../shared/i18n";
+import { useTranslate } from "../../shared/translations";
 import { S } from "../../shared/styles/faceRegister";
 
 interface IntroScreenProps {
   onStart: () => void;
   onExit?: () => void;
-  enableDebug?: boolean;
 }
 
-export default function IntroScreen({ onStart, onExit, enableDebug = true }: IntroScreenProps) {
-  const { t } = useTranslation(undefined, { i18n: libraryI18n });
-
-  if (enableDebug) {
-    console.log("[i18n-debug][IntroScreen:render]", {
-      language: libraryI18n.language,
-      introTitle: t("faceRegister.introTitle"),
-      introSub: t("faceRegister.introSub"),
-      introStep1: t("faceRegister.introStep1"),
-      introStep2: t("faceRegister.introStep2"),
-      introStep3: t("faceRegister.introStep3"),
-    });
-  }
+export default function IntroScreen({ onStart, onExit }: IntroScreenProps) {
+  const { t } = useTranslate();
 
   return (
     <div style={S.intro}>

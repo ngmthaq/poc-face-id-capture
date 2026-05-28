@@ -1,7 +1,6 @@
-import { useTranslation } from "react-i18next";
 import { ACCENT } from "../../shared/constants/faceRegister";
 import type { Capture } from "../../shared/types/faceRegister";
-import { libraryI18n } from "../../shared/i18n";
+import { useTranslate } from "../../shared/translations";
 import { S } from "../../shared/styles/faceRegister";
 
 interface ResultScreenProps {
@@ -9,26 +8,10 @@ interface ResultScreenProps {
   onReset: () => void;
   onSave: () => void;
   onExit?: () => void;
-  enableDebug?: boolean;
 }
 
-export default function ResultScreen({
-  captures,
-  onReset,
-  onSave,
-  onExit,
-  enableDebug = true,
-}: ResultScreenProps) {
-  const { t } = useTranslation(undefined, { i18n: libraryI18n });
-
-  if (enableDebug) {
-    console.log("[i18n-debug][ResultScreen:render]", {
-      language: libraryI18n.language,
-      resultTitle: t("faceRegister.resultTitle"),
-      resultSub: t("faceRegister.resultSub", { count: captures.length }),
-      captureCount: captures.length,
-    });
-  }
+export default function ResultScreen({ captures, onReset, onSave, onExit }: ResultScreenProps) {
+  const { t } = useTranslate();
 
   return (
     <div style={S.result}>

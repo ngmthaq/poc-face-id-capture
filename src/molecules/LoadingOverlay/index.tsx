@@ -1,9 +1,8 @@
-import { useTranslation } from "react-i18next";
-import { libraryI18n } from "../../shared/i18n";
+import { useTranslate } from "../../shared/translations";
 import { S } from "../../shared/styles/faceRegister";
 
 export default function LoadingOverlay() {
-  const { t } = useTranslation(undefined, { i18n: libraryI18n });
+  const { t } = useTranslate();
 
   return (
     <div style={S.loadingOverlay}>

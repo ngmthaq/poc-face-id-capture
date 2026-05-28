@@ -11,10 +11,8 @@ yarn add @ngmthaq20/react-face-id-capture
 ### Peer Dependencies
 
 ```bash
-yarn add react react-dom i18next react-i18next
+yarn add react react-dom
 ```
-
-> `i18next` and `react-i18next` are optional — the component will auto-initialize i18n if your app doesn't already use it.
 
 ## Quick Start
 
@@ -24,6 +22,7 @@ import { FaceRegister } from "@ngmthaq20/react-face-id-capture";
 function App() {
   return (
     <FaceRegister
+      locale="en"
       onComplete={(captures) => {
         // captures: array of 6 face images
         captures.forEach((c) => {
@@ -43,24 +42,24 @@ function App() {
 
 ## Props
 
-| Prop           | Type                            | Description                                                                     |
-| -------------- | ------------------------------- | ------------------------------------------------------------------------------- |
-| `onComplete`   | `(captures: Capture[]) => void` | Called when all 6 face images are captured and user taps "Save & Continue"       |
-| `onExit`       | `() => void`                    | Called when user taps back on intro screen or "Discard & Exit" on result screen  |
-| `locale`       | `string`                        | Override the active language (`"en"`, `"ja"`, or custom)                         |
-| `translations` | `FaceRegisterTranslations`      | Override or extend translation strings                                           |
+| Prop           | Type                            | Description                                                                             |
+| -------------- | ------------------------------- | --------------------------------------------------------------------------------------- |
+| `onComplete`   | `(captures: Capture[]) => void` | Called when all 6 face images are captured and user taps "Save & Continue"              |
+| `onExit`       | `() => void`                    | Called when user taps back on intro screen or "Discard & Exit" on result screen         |
+| `locale`       | `string`                        | Required. Active language (`"en"`, `"ja"`, or custom — falls back to `"en"` if unknown) |
+| `translations` | `FaceRegisterTranslations`      | Override or extend translation strings                                                  |
 
 ## Capture Object
 
 ```ts
 interface Capture {
   step: "center" | "top" | "topLeft" | "topRight" | "left" | "right";
-  labelKey: string; // i18n key for the step label (e.g. "faceRegister.labelCenter")
+  labelKey: string; // translation key for the step label (e.g. "faceRegister.labelCenter")
   data: string; // base64 JPEG data URL
 }
 ```
 
-## Internationalization
+## Translations
 
 Built-in languages: English (`en`) and Japanese (`ja`).
 

@@ -1,6 +1,5 @@
-import { useTranslation } from "react-i18next";
 import { ACCENT, STEPS } from "../../shared/constants/faceRegister";
-import { libraryI18n } from "../../shared/i18n";
+import { useTranslate } from "../../shared/translations";
 import { S } from "../../shared/styles/faceRegister";
 import SvgOverlay from "../../molecules/SvgOverlay";
 
@@ -17,7 +16,6 @@ interface CaptureScreenProps {
   onBack?: () => void;
   svgWidth: number;
   ovalCx: number;
-  enableDebug?: boolean;
 }
 
 export default function CaptureScreen({
@@ -33,20 +31,9 @@ export default function CaptureScreen({
   onBack,
   svgWidth,
   ovalCx,
-  enableDebug = true,
 }: CaptureScreenProps) {
-  const { t } = useTranslation(undefined, { i18n: libraryI18n });
+  const { t } = useTranslate();
   const step = STEPS[currentStep] ?? STEPS[0];
-
-  if (enableDebug) {
-    console.log("[i18n-debug][CaptureScreen:render]", {
-      language: libraryI18n.language,
-      currentStep,
-      hudTitle: t("faceRegister.hudTitle"),
-      instructionKey: step.instructionKey,
-      instruction: t(step.instructionKey),
-    });
-  }
 
   return (
     <div style={S.captureWrap}>

@@ -42,12 +42,8 @@ export interface FaceRegisterTranslations {
 export interface FaceRegisterProps {
   onComplete?: (captures: Capture[]) => void;
   onExit?: () => void;
-  locale?: string;
+  locale: string;
   translations?: FaceRegisterTranslations;
-  /**
-   * Enables verbose `[i18n-debug]` console logging across the i18n pipeline and the three
-   * organism screens. Default is `true`. Consumers should set this to `false` in production
-   * to silence the debug output.
-   */
+  /** Reserved for future verbose logging. Currently a no-op. Default `true`. */
   enableDebug?: boolean;
 }

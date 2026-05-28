@@ -79,6 +79,16 @@ export default function SvgOverlay({
       preserveAspectRatio="xMidYMid meet"
       style={S.svgOverlay}
     >
+      <ellipse
+        cx={ovalCx}
+        cy={OVAL_CY}
+        rx={OVAL_RX}
+        ry={OVAL_RY}
+        fill="none"
+        stroke="rgba(255,255,255,0.25)"
+        strokeWidth="1.5"
+      />
+
       {/* countdown ring */}
       {countdownActive && (
         <ellipse

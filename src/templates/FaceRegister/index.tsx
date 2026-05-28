@@ -1,11 +1,11 @@
-import { useRef, useState, useEffect, useLayoutEffect, useCallback, useMemo } from "react";
+import { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import { STEPS, SVG_WIDTH, OVAL_CX, type Screen } from "../../shared/constants/faceRegister";
 import type {
   Capture,
   FaceRegisterProps,
   FaceRegisterTranslations,
 } from "../../shared/types/faceRegister";
-import { applyI18nConfig, libraryI18n, setI18nDebugEnabled } from "../../shared/i18n";
+import { TranslationProvider, resolveTranslations } from "../../shared/translations";
 import { injectStyles, S } from "../../shared/styles/faceRegister";
 import { useCamera } from "../../shared/hooks/useCamera";
 import { useFaceModels } from "../../shared/hooks/useFaceModels";
@@ -23,7 +23,7 @@ export default function FaceRegister({
   onExit,
   locale,
   translations,
-  enableDebug = true,
+  enableDebug: _enableDebug = true,
 }: FaceRegisterProps) {
   const { videoRef, canvasRef, videoDims, startCamera, stopCamera, captureFrame } = useCamera();
 
@@ -44,35 +44,7 @@ export default function FaceRegister({
   const [crosshairPos, setCrosshairPos] = useState(STEPS[0].target);
   const [nosePos, setNosePos] = useState<{ x: number; y: number } | null>(null);
 
-  const i18nConfigRef = useRef(false);
-  if (!i18nConfigRef.current) {
-    if (enableDebug) {
-      console.log("[i18n-debug][FaceRegister:firstRender:before]", { locale, translations });
-    }
-    setI18nDebugEnabled(enableDebug);
-    applyI18nConfig(locale, translations);
-    if (enableDebug) {
-      console.log("[i18n-debug][FaceRegister:firstRender:after]", {
-        language: libraryI18n.language,
-        introStep1: libraryI18n.t("faceRegister.introStep1"),
-      });
-    }
-    i18nConfigRef.current = true;
-  }
-
-  useLayoutEffect(() => {
-    if (enableDebug) {
-      console.log("[i18n-debug][FaceRegister:layoutEffect:before]", { locale, translations });
-    }
-    setI18nDebugEnabled(enableDebug);
-    applyI18nConfig(locale, translations);
-    if (enableDebug) {
-      console.log("[i18n-debug][FaceRegister:layoutEffect:after]", {
-        language: libraryI18n.language,
-        introStep1: libraryI18n.t("faceRegister.introStep1"),
-      });
-    }
-  }, [locale, translations]);
+  const bundle = useMemo(() => resolveTranslations(locale, translations), [locale, translations]);
 
   useEffect(() => {
     injectStyles();
@@ -161,42 +133,40 @@ export default function FaceRegister({
   }, [loopRef]);
 
   return (
-    <div style={S.root}>
-      <canvas ref={canvasRef} style={{ display: "none" }} />
+    <TranslationProvider value={bundle}>
+      <div style={S.root}>
+        <canvas ref={canvasRef} style={{ display: "none" }} />
 
-      {loading && <LoadingOverlay />}
+        {loading && <LoadingOverlay />}
 
-      {screen === "intro" && (
-        <IntroScreen onStart={handleStart} onExit={onExit} enableDebug={enableDebug} />
-      )}
+        {screen === "intro" && <IntroScreen onStart={handleStart} onExit={onExit} />}
 
-      {screen === "capture" && (
-        <CaptureScreen
-          videoRef={videoRef}
-          currentStep={currentStep}
-          crosshairPos={crosshairPos}
-          matched={matched}
-          countdownActive={countdownActive}
-          nosePos={nosePos}
-          showFlash={showFlash}
-          outsideOval={outsideOval}
-          maskWarning={maskWarning}
-          onBack={handleReset}
-          svgWidth={svgDims.svgWidth}
-          ovalCx={svgDims.ovalCx}
-          enableDebug={enableDebug}
-        />
-      )}
+        {screen === "capture" && (
+          <CaptureScreen
+            videoRef={videoRef}
+            currentStep={currentStep}
+            crosshairPos={crosshairPos}
+            matched={matched}
+            countdownActive={countdownActive}
+            nosePos={nosePos}
+            showFlash={showFlash}
+            outsideOval={outsideOval}
+            maskWarning={maskWarning}
+            onBack={handleReset}
+            svgWidth={svgDims.svgWidth}
+            ovalCx={svgDims.ovalCx}
+          />
+        )}
 
-      {screen === "result" && (
-        <ResultScreen
-          captures={captures}
-          onReset={handleReset}
-          onSave={handleSave}
-          onExit={onExit}
-          enableDebug={enableDebug}
-        />
-      )}
-    </div>
+        {screen === "result" && (
+          <ResultScreen
+            captures={captures}
+            onReset={handleReset}
+            onSave={handleSave}
+            onExit={onExit}
+          />
+        )}
+      </div>
+    </TranslationProvider>
   );
 }
