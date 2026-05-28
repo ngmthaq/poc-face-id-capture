@@ -12,6 +12,7 @@
     "declarationDir": "dist",
     "emitDeclarationOnly": true,
     "outDir": "dist",
+    "rootDir": "src",
     "isolatedModules": true
   },
   "include": [

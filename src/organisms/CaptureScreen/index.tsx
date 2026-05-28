@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { ACCENT, STEPS } from "../../shared/constants/faceRegister";
+import { libraryI18n } from "../../shared/i18n";
 import { S } from "../../shared/styles/faceRegister";
 import SvgOverlay from "../../molecules/SvgOverlay";
 
@@ -32,7 +33,7 @@ export default function CaptureScreen({
   svgWidth,
   ovalCx,
 }: CaptureScreenProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(undefined, { i18n: libraryI18n });
   const step = STEPS[currentStep] ?? STEPS[0];
 
   return (
@@ -107,11 +108,7 @@ export default function CaptureScreen({
                 height: 8,
                 borderRadius: "50%",
                 background:
-                  i < currentStep
-                    ? ACCENT
-                    : i === currentStep
-                      ? "#fff"
-                      : "rgba(255,255,255,.2)",
+                  i < currentStep ? ACCENT : i === currentStep ? "#fff" : "rgba(255,255,255,.2)",
                 transition: "background .3s",
               }}
             />

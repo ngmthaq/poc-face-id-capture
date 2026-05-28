@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { ACCENT } from "../../shared/constants/faceRegister";
+import { libraryI18n } from "../../shared/i18n";
 import { S } from "../../shared/styles/faceRegister";
 
 interface IntroScreenProps {
@@ -8,7 +9,7 @@ interface IntroScreenProps {
 }
 
 export default function IntroScreen({ onStart, onExit }: IntroScreenProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(undefined, { i18n: libraryI18n });
 
   return (
     <div style={S.intro}>

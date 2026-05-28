@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { ACCENT } from "../../shared/constants/faceRegister";
 import type { Capture } from "../../shared/types/faceRegister";
+import { libraryI18n } from "../../shared/i18n";
 import { S } from "../../shared/styles/faceRegister";
 
 interface ResultScreenProps {
@@ -10,13 +11,8 @@ interface ResultScreenProps {
   onExit?: () => void;
 }
 
-export default function ResultScreen({
-  captures,
-  onReset,
-  onSave,
-  onExit,
-}: ResultScreenProps) {
-  const { t } = useTranslation();
+export default function ResultScreen({ captures, onReset, onSave, onExit }: ResultScreenProps) {
+  const { t } = useTranslation(undefined, { i18n: libraryI18n });
 
   return (
     <div style={S.result}>
@@ -35,9 +31,7 @@ export default function ResultScreen({
         </svg>
       </div>
       <div style={S.resultTitle}>{t("faceRegister.resultTitle")}</div>
-      <div style={S.resultSub}>
-        {t("faceRegister.resultSub", { count: captures.length })}
-      </div>
+      <div style={S.resultSub}>{t("faceRegister.resultSub", { count: captures.length })}</div>
       <div style={S.grid}>
         {captures.map((c) => (
           <div key={c.step} style={S.gridItem}>

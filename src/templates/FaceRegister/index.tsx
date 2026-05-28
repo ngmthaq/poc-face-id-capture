@@ -1,16 +1,11 @@
-import { useRef, useState, useEffect, useCallback, useMemo } from "react";
-import {
-  STEPS,
-  SVG_WIDTH,
-  OVAL_CX,
-  type Screen,
-} from "../../shared/constants/faceRegister";
+import { useRef, useState, useEffect, useLayoutEffect, useCallback, useMemo } from "react";
+import { STEPS, SVG_WIDTH, OVAL_CX, type Screen } from "../../shared/constants/faceRegister";
 import type {
   Capture,
   FaceRegisterProps,
   FaceRegisterTranslations,
 } from "../../shared/types/faceRegister";
-import { ensureI18n } from "../../shared/i18n";
+import { applyI18nConfig } from "../../shared/i18n";
 import { injectStyles, S } from "../../shared/styles/faceRegister";
 import { useCamera } from "../../shared/hooks/useCamera";
 import { useFaceModels } from "../../shared/hooks/useFaceModels";
@@ -29,8 +24,7 @@ export default function FaceRegister({
   locale,
   translations,
 }: FaceRegisterProps) {
-  const { videoRef, canvasRef, videoDims, startCamera, stopCamera, captureFrame } =
-    useCamera();
+  const { videoRef, canvasRef, videoDims, startCamera, stopCamera, captureFrame } = useCamera();
 
   const svgDims = videoDims
     ? getSvgDims(videoDims.w, videoDims.h)
@@ -47,12 +41,17 @@ export default function FaceRegister({
   const [maskWarning, setMaskWarning] = useState(false);
   const [outsideOval, setOutsideOval] = useState(false);
   const [crosshairPos, setCrosshairPos] = useState(STEPS[0].target);
-  const [nosePos, setNosePos] = useState<{ x: number; y: number } | null>(
-    null,
-  );
+  const [nosePos, setNosePos] = useState<{ x: number; y: number } | null>(null);
 
-  // Run synchronously before first render to ensure translations are available
-  ensureI18n(locale, translations);
+  const i18nConfigRef = useRef(false);
+  if (!i18nConfigRef.current) {
+    applyI18nConfig(locale, translations);
+    i18nConfigRef.current = true;
+  }
+
+  useLayoutEffect(() => {
+    applyI18nConfig(locale, translations);
+  }, [locale, translations]);
 
   useEffect(() => {
     injectStyles();
@@ -146,9 +145,7 @@ export default function FaceRegister({
 
       {loading && <LoadingOverlay />}
 
-      {screen === "intro" && (
-        <IntroScreen onStart={handleStart} onExit={onExit} />
-      )}
+      {screen === "intro" && <IntroScreen onStart={handleStart} onExit={onExit} />}
 
       {screen === "capture" && (
         <CaptureScreen
