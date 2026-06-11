@@ -14,7 +14,7 @@ export const STEPS: StepDef[] = [
     labelKey: "faceRegister.labelTop",
     instructionKey: "faceRegister.stepTop",
     target: { x: 200, y: 255 },
-    pose: { yaw: 0, pitch: -10, roll: 0 },
+    pose: { yaw: 0, pitch: -7, roll: 0 },
     check: (y, p) => p < -4 && p > -28 && Math.abs(y) < 18,
   },
   {
