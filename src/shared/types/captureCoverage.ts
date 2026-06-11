@@ -11,4 +11,5 @@ export interface CaptureCoverage {
   coveredSteps: Set<StepName>;
   nosePos: { x: number; y: number } | null;
   maskWarning: boolean;
+  complete: boolean;
 }

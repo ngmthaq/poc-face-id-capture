@@ -22,15 +22,14 @@ export function scorePoseAgainstStep(
 }
 
 /**
- * Pick the single best qualifying frame per step. A frame qualifies for a
- * step only if it passed that step's `check()` (encoded in `qualifies`).
- * Steps with no qualifying frame are returned in `missingSteps`.
+ * Pick the single highest-scoring frame per step regardless of qualification,
+ * so the frame closest to each step's ideal pose always wins. Steps with no
+ * scored frame at all are returned in `missingSteps`.
  */
 export function selectBestFramesPerStep(scoredFrames: ScoredFrame[]): FrameSelection {
   const bestByStep = new Map<StepName, ScoredFrame>();
 
   for (const frame of scoredFrames) {
-    if (!frame.qualifies) continue;
     const current = bestByStep.get(frame.step.name);
     if (!current || frame.score > current.score) {
       bestByStep.set(frame.step.name, frame);

@@ -6,7 +6,7 @@ export interface Point {
 export interface SvgDims {
   svgWidth: number;
   svgHeight: number;
-  ovalCx: number;
+  cx: number;
 }
 
 export interface FaceLandmarks {

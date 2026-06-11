@@ -1,7 +1,6 @@
 import { useRef, useState, useEffect, useCallback, useMemo } from "react";
-import { SVG_WIDTH, OVAL_CX } from "../../shared/constants/geometry";
+import { SVG_WIDTH, CIRCLE_CX } from "../../shared/constants/geometry";
 import type { Capture } from "../../shared/types/capture";
-import type { FaceRegisterProps } from "../../shared/types/props";
 import type { FaceRegisterTranslations } from "../../shared/types/translations";
 import type { Screen } from "../../shared/types/screen";
 import { TranslationProvider, resolveTranslations } from "../../shared/translations";
@@ -12,34 +11,41 @@ import { useFaceRecorder } from "../../shared/hooks/useFaceRecorder";
 import { useCaptureCoverage } from "../../shared/hooks/useCaptureCoverage";
 import { usePostProcess } from "../../shared/hooks/usePostProcess";
 import { getSvgDims } from "../../shared/utils/faceCalculations";
-import IntroScreen from "../../organisms/IntroScreen";
 import CaptureScreen from "../../organisms/CaptureScreen";
 import ProcessingScreen from "../../organisms/ProcessingScreen";
-import RetryScreen from "../../organisms/RetryScreen";
 import ResultScreen from "../../organisms/ResultScreen";
 import LoadingOverlay from "../../molecules/LoadingOverlay";
 
-export type { Capture, FaceRegisterProps, FaceRegisterTranslations };
-
 const isDev = import.meta.env.DEV;
+
+export interface FaceRegisterProps {
+  onComplete?: (captures: Capture[]) => void;
+  onExit?: () => void;
+  locale: string;
+  translations?: FaceRegisterTranslations;
+  /** Reserved for future verbose logging. Currently a no-op. Default `true`. */
+  enableDebug?: boolean;
+  /** When true, show the result screen after capture; when false (default), skip it and call onComplete automatically. */
+  showResultScreen?: boolean;
+}
 
 export default function FaceRegister({
   onComplete,
   onExit,
   locale,
   translations,
-  enableDebug: _enableDebug = true,
+  showResultScreen = false,
 }: FaceRegisterProps) {
   const { videoRef, canvasRef, streamRef, videoDims, startCamera, stopCamera } = useCamera();
-  const { loading, loadModels } = useFaceModels();
+  const { modelsLoaded, loading, loadModels } = useFaceModels();
   const { startRecording, stopRecording } = useFaceRecorder();
   const { process } = usePostProcess();
 
   const svgDims = videoDims
     ? getSvgDims(videoDims.w, videoDims.h)
-    : { svgWidth: SVG_WIDTH, svgHeight: 600, ovalCx: OVAL_CX };
+    : { svgWidth: SVG_WIDTH, svgHeight: 600, cx: CIRCLE_CX };
 
-  const [screen, setScreen] = useState<Screen>("intro");
+  const [screen, setScreen] = useState<Screen>("capture");
   const [captures, setCaptures] = useState<Capture[]>([]);
 
   const recordingRef = useRef(false);
@@ -51,7 +57,11 @@ export default function FaceRegister({
     injectStyles();
   }, []);
 
-  /* ── post-process the recorded motion, then route to result or retry ── */
+  useEffect(() => {
+    loadModels();
+  }, [loadModels]);
+
+  /* ── post-process the recorded motion, then route to result or complete ── */
   const finishRecording = useCallback(async () => {
     if (completingRef.current) return;
     completingRef.current = true;
@@ -61,49 +71,38 @@ export default function FaceRegister({
     stopCamera();
     setScreen("processing");
 
-    let result: Awaited<ReturnType<typeof process>>;
+    let selected: Capture[];
     try {
-      result = await process(blob);
+      const result = await process(blob);
+      selected = result.captures;
     } catch (error) {
-      if (isDev) console.error("[FaceReg] post-process failed, showing retry:", error);
-      setCaptures([]);
-      setScreen("retry");
-      return;
-    }
-
-    const { captures: selected, missingSteps } = result;
-
-    if (missingSteps.length > 0) {
-      if (isDev) console.log("[FaceReg] missing steps, showing retry:", missingSteps);
-      setCaptures([]);
-      setScreen("retry");
-      return;
+      if (isDev) console.error("[FaceReg] post-process failed:", error);
+      selected = [];
     }
 
     setCaptures(selected);
-    setScreen("result");
-  }, [stopRecording, stopCamera, process]);
+    if (showResultScreen) {
+      setScreen("result");
+    } else {
+      onComplete?.(selected);
+    }
+  }, [stopRecording, stopCamera, process, showResultScreen, onComplete]);
 
-  const { coveredSteps, nosePos, maskWarning } = useCaptureCoverage({
+  const { coveredSteps, nosePos, maskWarning, complete } = useCaptureCoverage({
     videoRef,
-    active: screen === "capture",
+    active: screen === "capture" && modelsLoaded,
     onComplete: finishRecording,
   });
 
-  /* ── enter capture: start camera + recording ── */
+  /* ── restart capture (Register Again) ── */
   const startCapture = useCallback(() => {
     completingRef.current = false;
     setCaptures([]);
     setScreen("capture");
   }, []);
 
-  const handleStart = useCallback(async () => {
-    await loadModels();
-    startCapture();
-  }, [loadModels, startCapture]);
-
   useEffect(() => {
-    if (screen !== "capture") return;
+    if (screen !== "capture" || !modelsLoaded) return;
     let cancelled = false;
 
     const init = async () => {
@@ -121,17 +120,16 @@ export default function FaceRegister({
     return () => {
       cancelled = true;
     };
-  }, [screen, startCamera, startRecording, streamRef]);
+  }, [screen, modelsLoaded, startCamera, startRecording, streamRef]);
 
-  /* ── reset / abort back to intro ── */
-  const handleReset = useCallback(async () => {
+  /* ── abort and exit ── */
+  const handleBack = useCallback(async () => {
     if (recordingRef.current) await stopRecording();
     completingRef.current = false;
     recordingRef.current = false;
     stopCamera();
-    setCaptures([]);
-    setScreen("intro");
-  }, [stopRecording, stopCamera]);
+    onExit?.();
+  }, [stopRecording, stopCamera, onExit]);
 
   const handleSave = useCallback(() => {
     if (onComplete) {
@@ -148,28 +146,25 @@ export default function FaceRegister({
 
         {loading && <LoadingOverlay />}
 
-        {screen === "intro" && <IntroScreen onStart={handleStart} onExit={onExit} />}
-
         {screen === "capture" && (
           <CaptureScreen
             videoRef={videoRef}
             coveredSteps={coveredSteps}
             nosePos={nosePos}
             maskWarning={maskWarning}
-            onBack={handleReset}
+            complete={complete}
+            onBack={onExit ? handleBack : undefined}
             svgWidth={svgDims.svgWidth}
-            ovalCx={svgDims.ovalCx}
+            cx={svgDims.cx}
           />
         )}
 
         {screen === "processing" && <ProcessingScreen />}
 
-        {screen === "retry" && <RetryScreen onRetry={startCapture} onExit={onExit} />}
-
         {screen === "result" && (
           <ResultScreen
             captures={captures}
-            onReset={handleReset}
+            onReset={startCapture}
             onSave={handleSave}
             onExit={onExit}
           />

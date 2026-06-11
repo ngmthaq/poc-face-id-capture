@@ -1,1 +1,1 @@
-export type Screen = "intro" | "capture" | "processing" | "retry" | "result";
+export type Screen = "capture" | "processing" | "result";

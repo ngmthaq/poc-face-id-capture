@@ -13,7 +13,7 @@ const isDev = import.meta.env.DEV;
 /**
  * Post-process a recorded Blob: sample frames, run face-api landmarks on each,
  * derive yaw/pitch/roll, skip masked frames, score every frame against all six
- * steps, then select the best qualifying frame per step. Each returned capture
+ * steps, then select the highest-scoring frame per step. Each returned capture
  * carries a JPEG data URL rendered from its source frame.
  */
 export function usePostProcess() {
@@ -42,7 +42,6 @@ export function usePostProcess() {
         scoredFrames.push({
           step,
           score: scorePoseAgainstStep(step, pose.yaw, pose.pitch, pose.roll),
-          qualifies: step.check(pose.yaw, pose.pitch, pose.roll),
           data,
         });
       }

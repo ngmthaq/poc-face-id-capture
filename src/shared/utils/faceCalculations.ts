@@ -4,12 +4,12 @@ import type { Point, SvgDims, FaceLandmarks, PoseMeasurement } from "../types/fa
 /**
  * Compute SVG viewBox dimensions that match the video's aspect ratio.
  * Height is always SVG_HEIGHT (600). Width scales proportionally.
- * The oval stays horizontally centered.
+ * The circle stays horizontally centered.
  */
 export function getSvgDims(videoWidth: number, videoHeight: number): SvgDims {
   const svgHeight = SVG_HEIGHT;
   const svgWidth = (videoWidth / videoHeight) * svgHeight;
-  return { svgWidth, svgHeight, ovalCx: svgWidth / 2 };
+  return { svgWidth, svgHeight, cx: svgWidth / 2 };
 }
 
 export function getEyeCenter(eyePoints: Point[]): Point {

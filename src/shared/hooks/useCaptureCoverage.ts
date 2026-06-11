@@ -2,7 +2,11 @@ import { useRef, useState, useCallback, useEffect } from "react";
 import * as faceapi from "@vladmandic/face-api";
 
 import { STEPS } from "../constants/steps";
-import { COVERAGE_DETECT_INTERVAL_MS, MAX_RECORDING_MS } from "../constants/recording";
+import {
+  COVERAGE_DETECT_INTERVAL_MS,
+  MAX_RECORDING_MS,
+  COMPLETE_HOLD_MS,
+} from "../constants/recording";
 import { MASK_THRESHOLD } from "../constants/detection";
 import type { StepName } from "../types/steps";
 import type { CaptureCoverageOptions, CaptureCoverage } from "../types/captureCoverage";
@@ -25,6 +29,7 @@ export function useCaptureCoverage({
   const [coveredSteps, setCoveredSteps] = useState<Set<StepName>>(new Set());
   const [nosePos, setNosePos] = useState<{ x: number; y: number } | null>(null);
   const [maskWarning, setMaskWarning] = useState(false);
+  const [complete, setComplete] = useState(false);
 
   const coveredRef = useRef<Set<StepName>>(new Set());
   const onCompleteRef = useRef(onComplete);
@@ -45,6 +50,7 @@ export function useCaptureCoverage({
     setCoveredSteps(new Set());
     setNosePos(null);
     setMaskWarning(false);
+    setComplete(false);
 
     let stopped = false;
     let loopTimer = 0;
@@ -97,15 +103,17 @@ export function useCaptureCoverage({
 
           if (!pose.masked) {
             for (const step of STEPS) {
-              if (step.check(pose.yaw, pose.pitch, pose.roll)) {
-                markCovered(step.name);
-              }
+              if (coveredRef.current.has(step.name)) continue;
+              if (step.check(pose.yaw, pose.pitch, pose.roll)) markCovered(step.name);
             }
           }
 
           if (coveredRef.current.size >= STEPS.length) {
             if (isDev) console.log("[FaceReg] coverage complete — all steps covered");
-            finish();
+            stopped = true;
+            window.clearTimeout(loopTimer);
+            setComplete(true);
+            loopTimer = window.setTimeout(() => onCompleteRef.current(), COMPLETE_HOLD_MS);
             return;
           }
         } else {
@@ -134,5 +142,5 @@ export function useCaptureCoverage({
     };
   }, [active, videoRef, markCovered]);
 
-  return { coveredSteps, nosePos, maskWarning };
+  return { coveredSteps, nosePos, maskWarning, complete };
 }

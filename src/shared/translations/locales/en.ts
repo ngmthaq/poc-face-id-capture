@@ -3,7 +3,7 @@ export default {
     // Intro screen
     introTitle: "Face Registration",
     introSub: "Set up your face profile for identification",
-    introStep1: "Position your face within the oval frame",
+    introStep1: "Position your face within the circle",
     introStep2: "Slowly roll your head in a circle",
     introStep3: "Hold steady while we capture each angle",
     getStarted: "Get Started",

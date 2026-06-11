@@ -4,6 +4,12 @@
 export const MAX_RECORDING_MS = 15000;
 
 /**
+ * How long the fully-covered, all-green progress ring is held on screen before
+ * transitioning to post-processing, so the user sees a clear "complete" state.
+ */
+export const COMPLETE_HOLD_MS = 700;
+
+/**
  * Cadence (ms) of the lightweight live coverage detection loop while
  * recording. Kept low-frequency so recording stays smooth.
  */

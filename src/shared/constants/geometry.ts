@@ -1,9 +1,10 @@
 export const SVG_WIDTH = 400;
 export const SVG_HEIGHT = 600;
-export const OVAL_CX = 200;
-export const OVAL_CY = 270;
-export const OVAL_RX = 130;
-export const OVAL_RY = 170;
+export const CIRCLE_CX = 200;
+export const CIRCLE_CY = 270;
+export const CIRCLE_R = 150;
 
-/** Radius of the directional step slots on the progress ring oval edge. */
-export const SLOT_RADIUS = 7;
+export const TICK_COUNT = 30;
+export const TICK_GAP = 8;
+export const TICK_LENGTH = 12;
+export const TICK_WIDTH = 3;

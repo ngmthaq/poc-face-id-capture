@@ -9,9 +9,10 @@ interface CaptureScreenProps {
   coveredSteps: Set<StepName>;
   nosePos: { x: number; y: number } | null;
   maskWarning: boolean;
+  complete: boolean;
   onBack?: () => void;
   svgWidth: number;
-  ovalCx: number;
+  cx: number;
 }
 
 export default function CaptureScreen({
@@ -19,20 +20,25 @@ export default function CaptureScreen({
   coveredSteps,
   nosePos,
   maskWarning,
+  complete,
   onBack,
   svgWidth,
-  ovalCx,
+  cx,
 }: CaptureScreenProps) {
   const { t } = useTranslate();
+
+  const nextStep = STEPS.find((s) => !coveredSteps.has(s.name)) ?? null;
 
   return (
     <div style={S.captureWrap}>
       <video ref={videoRef} playsInline muted style={S.video} />
       <ProgressRing
         coveredSteps={coveredSteps}
+        nextStep={nextStep?.name ?? null}
         nosePos={nosePos}
+        complete={complete}
         svgWidth={svgWidth}
-        ovalCx={ovalCx}
+        cx={cx}
       />
 
       {/* HUD top */}
@@ -66,7 +72,11 @@ export default function CaptureScreen({
       {/* bottom bar */}
       <div style={S.bottomBar}>
         <div style={S.instruction}>
-          {maskWarning ? t("faceRegister.maskWarning") : t("faceRegister.recordingInstruction")}
+          {maskWarning
+            ? t("faceRegister.maskWarning")
+            : nextStep
+              ? t(nextStep.instructionKey)
+              : t("faceRegister.recordingInstruction")}
         </div>
         {maskWarning && (
           <div

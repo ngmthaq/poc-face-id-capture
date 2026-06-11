@@ -4,7 +4,6 @@ import type { Capture } from "./capture";
 export interface ScoredFrame {
   step: StepDef;
   score: number;
-  qualifies: boolean;
   data: string;
 }
 

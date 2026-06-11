@@ -3,7 +3,7 @@ export default {
     // Intro screen
     introTitle: "顔登録",
     introSub: "本人確認のために顔プロフィールを設定します",
-    introStep1: "楕円のフレーム内に顔を配置してください",
+    introStep1: "円のフレーム内に顔を配置してください",
     introStep2: "頭をゆっくりと円を描くように回してください",
     introStep3: "各角度を撮影する間、姿勢を保ってください",
     getStarted: "開始する",
