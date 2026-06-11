@@ -8,6 +8,13 @@
 export const RECORDING_SAFETY_CAP_MS = 60000;
 
 /**
+ * Silent alignment grace (ms) after the camera preview is live, before
+ * recording and coverage detection begin — gives the user a moment to
+ * center their face in frame.
+ */
+export const ALIGN_GRACE_MS = 1000;
+
+/**
  * Combined yaw/pitch magnitude (degrees) below which the head is considered
  * near-centered and no ring tick fills. Keeps small jitter from lighting ticks.
  */

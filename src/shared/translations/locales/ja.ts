@@ -5,7 +5,7 @@ export default {
     introSub: "本人確認のために顔プロフィールを設定します",
     introStep1: "円のフレーム内に顔を配置してください",
     introStep2: "頭をゆっくりと円を描くように回してください",
-    introStep3: "各角度を撮影する間、姿勢を保ってください",
+    introStep3: "各角度で姿勢を保ってください",
     getStarted: "開始する",
     back: "戻る",
 
@@ -37,7 +37,7 @@ export default {
 
     // Processing screen
     processingTitle: "解析中",
-    processingSub: "動きの中から最適な画像を選んでいます...",
+    processingSub: "動きの中から最適な画像を選んでいます",
 
     // Retry screen
     retryTitle: "もう一度お試しください",
@@ -46,11 +46,11 @@ export default {
     retryButton: "もう一度試す",
 
     // Result screen
-    resultTitle: "登録完了",
+    resultTitle: "撮影完了",
     resultSub: "{{count}}枚の顔画像を撮影しました",
     registerAgain: "もう一度登録",
-    save: "保存して続行",
-    discard: "破棄して終了",
+    save: "続行",
+    discard: "終了",
 
     // Loading
     loadingModels: "顔検出モデルを読み込んでいます...",

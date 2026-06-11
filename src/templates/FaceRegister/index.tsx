@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import { SVG_WIDTH, CIRCLE_CX } from "../../shared/constants/geometry";
+import { ALIGN_GRACE_MS } from "../../shared/constants/recording";
 import type { Capture } from "../../shared/types/capture";
 import type { FaceRegisterTranslations } from "../../shared/types/translations";
 import type { Screen } from "../../shared/types/screen";
@@ -24,9 +25,7 @@ export interface FaceRegisterProps {
   onExit?: () => void;
   locale: string;
   translations?: FaceRegisterTranslations;
-  /** Reserved for future verbose logging. Currently a no-op. Default `true`. */
-  enableDebug?: boolean;
-  /** When true, show the result screen after capture; when false (default), skip it and call onComplete automatically. */
+  showIntroScreen?: boolean;
   showResultScreen?: boolean;
 }
 
@@ -35,6 +34,7 @@ export default function FaceRegister({
   onExit,
   locale,
   translations,
+  showIntroScreen = false,
   showResultScreen = false,
 }: FaceRegisterProps) {
   const { videoRef, canvasRef, streamRef, videoDims, startCamera, stopCamera } = useCamera();
@@ -46,8 +46,9 @@ export default function FaceRegister({
     ? getSvgDims(videoDims.w, videoDims.h)
     : { svgWidth: SVG_WIDTH, svgHeight: 600, cx: CIRCLE_CX };
 
-  const [screen, setScreen] = useState<Screen>("intro");
+  const [screen, setScreen] = useState<Screen>(showIntroScreen ? "intro" : "capture");
   const [captures, setCaptures] = useState<Capture[]>([]);
+  const [captureArmed, setCaptureArmed] = useState(false);
 
   const recordingRef = useRef(false);
   const completingRef = useRef(false);
@@ -91,7 +92,7 @@ export default function FaceRegister({
 
   const { coveredTicks, centerCovered, nosePos, maskWarning, complete } = useCaptureCoverage({
     videoRef,
-    active: screen === "capture" && modelsLoaded,
+    active: screen === "capture" && modelsLoaded && captureArmed,
     onComplete: finishRecording,
   });
 
@@ -114,12 +115,16 @@ export default function FaceRegister({
     const init = async () => {
       await new Promise((r) => requestAnimationFrame(r));
       if (cancelled) return;
+      setCaptureArmed(false);
       await startCamera();
       if (cancelled) return;
       await new Promise((r) => setTimeout(r, 500));
       if (cancelled || !streamRef.current) return;
+      await new Promise((r) => setTimeout(r, ALIGN_GRACE_MS));
+      if (cancelled || !streamRef.current) return;
       startRecording(streamRef.current);
       recordingRef.current = true;
+      setCaptureArmed(true);
     };
     init();
 

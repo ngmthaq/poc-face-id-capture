@@ -90,7 +90,14 @@ export function useCaptureCoverage({
       if (stopped) return;
       const video = videoRef.current;
 
-      if (!video || video.paused || video.ended) {
+      if (
+        !video ||
+        video.paused ||
+        video.ended ||
+        video.videoWidth === 0 ||
+        video.videoHeight === 0 ||
+        video.readyState < 2
+      ) {
         loopTimer = window.setTimeout(detect, COVERAGE_DETECT_INTERVAL_MS);
         return;
       }

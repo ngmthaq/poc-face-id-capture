@@ -5,7 +5,7 @@ export default {
     introSub: "Set up your face profile for identification",
     introStep1: "Position your face within the circle",
     introStep2: "Slowly roll your head in a circle",
-    introStep3: "Hold steady while we capture each angle",
+    introStep3: "Hold steady at each angle",
     getStarted: "Get Started",
     back: "Back",
 
@@ -37,7 +37,7 @@ export default {
 
     // Processing screen
     processingTitle: "Analyzing",
-    processingSub: "Selecting the best images from your motion...",
+    processingSub: "Selecting the best images from your motion",
 
     // Retry screen
     retryTitle: "Let's try that again",
@@ -46,11 +46,11 @@ export default {
     retryButton: "Try Again",
 
     // Result screen
-    resultTitle: "Registration Complete",
-    resultSub: "{{count}} face images captured successfully",
+    resultTitle: "Capture Complete",
+    resultSub: "{{count}} face images captured",
     registerAgain: "Register Again",
-    save: "Save & Continue",
-    discard: "Discard & Exit",
+    save: "Continue",
+    discard: "Exit",
 
     // Loading
     loadingModels: "Loading face detection models...",

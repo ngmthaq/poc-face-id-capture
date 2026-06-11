@@ -35,17 +35,17 @@ Rules:
 
 ## 2. Naming
 
-| Item                            | Convention              | Example                              |
-| ------------------------------- | ----------------------- | ------------------------------------ |
-| Component files                 | PascalCase `.tsx`       | `CaptureScreen.tsx`                  |
-| Hook files                      | camelCase, `use` prefix | `useFaceDetection.ts`                |
-| Util files                      | camelCase               | `faceCalculations.ts`                |
-| Component folder                | PascalCase              | `FaceRegister/`, `LoadingOverlay/`   |
+| Item                            | Convention              | Example                                                   |
+| ------------------------------- | ----------------------- | --------------------------------------------------------- |
+| Component files                 | PascalCase `.tsx`       | `CaptureScreen.tsx`                                       |
+| Hook files                      | camelCase, `use` prefix | `useFaceDetection.ts`                                     |
+| Util files                      | camelCase               | `faceCalculations.ts`                                     |
+| Component folder                | PascalCase              | `FaceRegister/`, `LoadingOverlay/`                        |
 | Atomic-layer folders            | lowercase               | `molecules/`, `organisms/`, `templates/`, `shared/hooks/` |
-| Components / types / interfaces | PascalCase              | `FaceRegister`, `Capture`, `StepDef` |
-| Hooks / vars / functions        | camelCase               | `useCamera`, `calcYaw`               |
-| Constants                       | `SCREAMING_SNAKE_CASE`  | `STEPS`, `COUNTDOWN_MS`, `ACCENT`    |
-| i18n keys                       | dotted `feature.key`    | `faceRegister.labelCenter`           |
+| Components / types / interfaces | PascalCase              | `FaceRegister`, `Capture`, `StepDef`                      |
+| Hooks / vars / functions        | camelCase               | `useCamera`, `calcYaw`                                    |
+| Constants                       | `SCREAMING_SNAKE_CASE`  | `STEPS`, `COUNTDOWN_MS`, `ACCENT`                         |
+| i18n keys                       | dotted `feature.key`    | `faceRegister.labelCenter`                                |
 
 ---
 

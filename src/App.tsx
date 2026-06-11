@@ -3,10 +3,11 @@ import FaceRegister from "./templates/FaceRegister";
 export default function App() {
   return (
     <FaceRegister
-      locale="en"
+      showIntroScreen
       showResultScreen
+      locale="en"
       onComplete={(captures) => console.log("Captures:", captures)}
-      onExit={() => {}}
+      onExit={() => console.log("Exited")}
     />
   );
 }
