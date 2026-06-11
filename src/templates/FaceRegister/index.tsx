@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, useCallback, useMemo } from "react";
-import { STEPS, SVG_WIDTH, OVAL_CX, type Screen } from "../../shared/constants/faceRegister";
+import { SVG_WIDTH, OVAL_CX, type Screen } from "../../shared/constants/faceRegister";
 import type {
   Capture,
   FaceRegisterProps,
@@ -9,14 +9,20 @@ import { TranslationProvider, resolveTranslations } from "../../shared/translati
 import { injectStyles, S } from "../../shared/styles/faceRegister";
 import { useCamera } from "../../shared/hooks/useCamera";
 import { useFaceModels } from "../../shared/hooks/useFaceModels";
-import { useFaceDetection } from "../../shared/hooks/useFaceDetection";
+import { useFaceRecorder } from "../../shared/hooks/useFaceRecorder";
+import { useCaptureCoverage } from "../../shared/hooks/useCaptureCoverage";
+import { usePostProcess } from "../../shared/hooks/usePostProcess";
 import { getSvgDims } from "../../shared/utils/faceCalculations";
 import IntroScreen from "../../organisms/IntroScreen";
 import CaptureScreen from "../../organisms/CaptureScreen";
+import ProcessingScreen from "../../organisms/ProcessingScreen";
+import RetryScreen from "../../organisms/RetryScreen";
 import ResultScreen from "../../organisms/ResultScreen";
 import LoadingOverlay from "../../molecules/LoadingOverlay";
 
 export type { Capture, FaceRegisterProps, FaceRegisterTranslations };
+
+const isDev = import.meta.env.DEV;
 
 export default function FaceRegister({
   onComplete,
@@ -25,116 +31,116 @@ export default function FaceRegister({
   translations,
   enableDebug: _enableDebug = true,
 }: FaceRegisterProps) {
-  const { videoRef, canvasRef, videoDims, startCamera, stopCamera, captureFrame } = useCamera();
+  const { videoRef, canvasRef, streamRef, videoDims, startCamera, stopCamera } = useCamera();
+  const { loading, loadModels } = useFaceModels();
+  const { startRecording, stopRecording } = useFaceRecorder();
+  const { process } = usePostProcess();
 
   const svgDims = videoDims
     ? getSvgDims(videoDims.w, videoDims.h)
     : { svgWidth: SVG_WIDTH, svgHeight: 600, ovalCx: OVAL_CX };
 
-  const { loading, loadModels } = useFaceModels();
-
   const [screen, setScreen] = useState<Screen>("intro");
-  const [currentStep, setCurrentStep] = useState(0);
   const [captures, setCaptures] = useState<Capture[]>([]);
-  const [matched, setMatched] = useState(false);
-  const [countdownActive, setCountdownActive] = useState(false);
-  const [showFlash, setShowFlash] = useState(false);
-  const [maskWarning, setMaskWarning] = useState(false);
-  const [outsideOval, setOutsideOval] = useState(false);
-  const [crosshairPos, setCrosshairPos] = useState(STEPS[0].target);
-  const [nosePos, setNosePos] = useState<{ x: number; y: number } | null>(null);
 
-  const bundle = useMemo(() => {
-    const response = resolveTranslations(locale, translations);
-    console.log("bundle", response);
-    return response;
-  }, [locale, translations]);
+  const recordingRef = useRef(false);
+  const completingRef = useRef(false);
+
+  const bundle = useMemo(() => resolveTranslations(locale, translations), [locale, translations]);
 
   useEffect(() => {
     injectStyles();
   }, []);
 
-  const detectionCallbacks = useMemo(
-    () => ({
-      setMatched,
-      setCountdownActive,
-      setNosePos,
-      setMaskWarning,
-      setOutsideOval,
-      setCaptures,
-      setShowFlash,
-      setCurrentStep,
-      setCrosshairPos,
-      setScreen,
-      captureFrame,
-      stopCamera,
-    }),
-    [captureFrame, stopCamera],
-  );
+  /* ── post-process the recorded motion, then route to result or retry ── */
+  const finishRecording = useCallback(async () => {
+    if (completingRef.current) return;
+    completingRef.current = true;
+    recordingRef.current = false;
 
-  const { loopRef, runDetection } = useFaceDetection(detectionCallbacks);
+    const blob = await stopRecording();
+    stopCamera();
+    setScreen("processing");
 
-  /* ── start capture flow ── */
+    let result: Awaited<ReturnType<typeof process>>;
+    try {
+      result = await process(blob);
+    } catch (error) {
+      if (isDev) console.error("[FaceReg] post-process failed, showing retry:", error);
+      setCaptures([]);
+      setScreen("retry");
+      return;
+    }
+
+    const { captures: selected, missingSteps } = result;
+
+    if (missingSteps.length > 0) {
+      if (isDev) console.log("[FaceReg] missing steps, showing retry:", missingSteps);
+      setCaptures([]);
+      setScreen("retry");
+      return;
+    }
+
+    setCaptures(selected);
+    setScreen("result");
+  }, [stopRecording, stopCamera, process]);
+
+  const { coveredSteps, nosePos, maskWarning } = useCaptureCoverage({
+    videoRef,
+    active: screen === "capture",
+    onComplete: finishRecording,
+  });
+
+  /* ── enter capture: start camera + recording ── */
+  const startCapture = useCallback(() => {
+    completingRef.current = false;
+    setCaptures([]);
+    setScreen("capture");
+  }, []);
+
   const handleStart = useCallback(async () => {
     await loadModels();
-    setCurrentStep(0);
-    setCaptures([]);
-    setMatched(false);
-    setCountdownActive(false);
-    setCrosshairPos(STEPS[0].target);
-    setScreen("capture");
-  }, [loadModels]);
-
-  /* ── kick off camera + detection once capture screen mounts ── */
-  const stopDetectionRef = useRef<(() => void) | null>(null);
+    startCapture();
+  }, [loadModels, startCapture]);
 
   useEffect(() => {
     if (screen !== "capture") return;
     let cancelled = false;
+
     const init = async () => {
       await new Promise((r) => requestAnimationFrame(r));
       if (cancelled) return;
       await startCamera();
       if (cancelled) return;
       await new Promise((r) => setTimeout(r, 500));
-      if (cancelled) return;
-      const stopFn = runDetection(0, [], videoRef);
-      stopDetectionRef.current = stopFn ?? null;
+      if (cancelled || !streamRef.current) return;
+      startRecording(streamRef.current);
+      recordingRef.current = true;
     };
     init();
+
     return () => {
       cancelled = true;
-      stopDetectionRef.current?.();
-      stopDetectionRef.current = null;
     };
-  }, [screen, startCamera, runDetection, videoRef]);
+  }, [screen, startCamera, startRecording, streamRef]);
 
-  /* ── reset ── */
-  const handleReset = useCallback(() => {
+  /* ── reset / abort back to intro ── */
+  const handleReset = useCallback(async () => {
+    if (recordingRef.current) await stopRecording();
+    completingRef.current = false;
+    recordingRef.current = false;
     stopCamera();
-    setScreen("intro");
-    setCurrentStep(0);
     setCaptures([]);
-    setMatched(false);
-    setCountdownActive(false);
-  }, [stopCamera]);
+    setScreen("intro");
+  }, [stopRecording, stopCamera]);
 
-  /* ── save ── */
   const handleSave = useCallback(() => {
     if (onComplete) {
       onComplete(captures);
-    } else if (import.meta.env.DEV) {
+    } else if (isDev) {
       console.log("Face registration captures:", captures);
     }
   }, [captures, onComplete]);
-
-  /* ── cleanup ── */
-  useEffect(() => {
-    return () => {
-      clearTimeout(loopRef.current);
-      stopDetectionRef.current?.();
-    };
-  }, [loopRef]);
 
   return (
     <TranslationProvider value={bundle}>
@@ -148,19 +154,18 @@ export default function FaceRegister({
         {screen === "capture" && (
           <CaptureScreen
             videoRef={videoRef}
-            currentStep={currentStep}
-            crosshairPos={crosshairPos}
-            matched={matched}
-            countdownActive={countdownActive}
+            coveredSteps={coveredSteps}
             nosePos={nosePos}
-            showFlash={showFlash}
-            outsideOval={outsideOval}
             maskWarning={maskWarning}
             onBack={handleReset}
             svgWidth={svgDims.svgWidth}
             ovalCx={svgDims.ovalCx}
           />
         )}
+
+        {screen === "processing" && <ProcessingScreen />}
+
+        {screen === "retry" && <RetryScreen onRetry={startCapture} onExit={onExit} />}
 
         {screen === "result" && (
           <ResultScreen

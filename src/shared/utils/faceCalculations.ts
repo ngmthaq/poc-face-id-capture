@@ -1,7 +1,4 @@
-import {
-  SVG_HEIGHT,
-  FACE_CENTER_Y,
-} from "../constants/faceRegister";
+import { SVG_HEIGHT } from "../constants/faceRegister";
 
 interface Point {
   x: number;
@@ -32,31 +29,17 @@ export function getEyeCenter(eyePoints: Point[]): Point {
   };
 }
 
-export function calcYaw(
-  noseTipX: number,
-  eyeMidX: number,
-  faceWidth: number,
-): number {
+export function calcYaw(noseTipX: number, eyeMidX: number, faceWidth: number): number {
   return ((noseTipX - eyeMidX) / (faceWidth * 0.5)) * 45;
 }
 
-export function calcPitch(
-  noseTipY: number,
-  eyeMidY: number,
-  faceHeight: number,
-): number {
+export function calcPitch(noseTipY: number, eyeMidY: number, faceHeight: number): number {
   return ((noseTipY - eyeMidY) / faceHeight - 0.21) * 80;
 }
 
-export function calcRoll(
-  leftEyeCenter: Point,
-  rightEyeCenter: Point,
-): number {
+export function calcRoll(leftEyeCenter: Point, rightEyeCenter: Point): number {
   return (
-    Math.atan2(
-      rightEyeCenter.y - leftEyeCenter.y,
-      rightEyeCenter.x - leftEyeCenter.x,
-    ) *
+    Math.atan2(rightEyeCenter.y - leftEyeCenter.y, rightEyeCenter.x - leftEyeCenter.x) *
     (180 / Math.PI)
   );
 }
@@ -74,46 +57,47 @@ export function toSvgCoords(
   };
 }
 
-export function checkFaceCentered(
-  positions: Point[],
-  videoWidth: number,
-  videoHeight: number,
-  dims: SvgDims,
-): boolean {
-  const faceCenterX =
-    (1 - (positions[27].x + positions[8].x) / 2 / videoWidth) * dims.svgWidth;
-  const faceCenterY =
-    ((positions[27].y + positions[8].y) / 2 / videoHeight) * dims.svgHeight;
-  const offCenterX = Math.abs(faceCenterX - dims.ovalCx);
-  const offCenterY = Math.abs(faceCenterY - FACE_CENTER_Y);
-  return offCenterX < 30 && offCenterY < 40;
+export function checkMask(upperLipY: number, lowerLipY: number, faceHeight: number): boolean {
+  const lipGap = Math.abs(lowerLipY - upperLipY) / faceHeight;
+  return lipGap < 0.105;
+}
+
+export interface FaceLandmarks {
+  positions: Point[];
+  getLeftEye: () => Point[];
+  getRightEye: () => Point[];
+  getJawOutline: () => Point[];
+}
+
+export interface PoseMeasurement {
+  yaw: number;
+  pitch: number;
+  roll: number;
+  masked: boolean;
+  noseTip: Point;
 }
 
 /**
- * Check whether the nose position (SVG coords) is inside the double-ring
- * crosshair area centered at the step target.
+ * Reduce a face-api landmark set to a head-pose measurement. Reuses the
+ * shared yaw/pitch/roll math and mask heuristic so the live coverage loop
+ * and the post-processing pass agree on how a frame is interpreted.
  */
-export function checkNoseInRing(
-  nosePos: Point,
-  target: Point,
-  svgWidth: number,
-  ringRadius: number = 35,
-): boolean {
-  // Apply the same x-offset used by SvgOverlay to map the 400-wide
-  // coordinate system to the dynamic SVG width.
-  const xOffset = (svgWidth - 400) / 2;
-  const tx = target.x + xOffset;
-  const ty = target.y;
-  const dx = nosePos.x - tx;
-  const dy = nosePos.y - ty;
-  return dx * dx + dy * dy <= ringRadius * ringRadius;
-}
+export function measurePose(landmarks: FaceLandmarks): PoseMeasurement {
+  const { positions } = landmarks;
+  const noseTip = positions[30];
+  const leftEyeCenter = getEyeCenter(landmarks.getLeftEye());
+  const rightEyeCenter = getEyeCenter(landmarks.getRightEye());
+  const eyeMidX = (leftEyeCenter.x + rightEyeCenter.x) / 2;
+  const eyeMidY = (leftEyeCenter.y + rightEyeCenter.y) / 2;
+  const jaw = landmarks.getJawOutline();
+  const faceWidth = Math.abs(jaw[jaw.length - 1].x - jaw[0].x);
+  const faceHeight = Math.abs(positions[8].y - positions[19].y);
 
-export function checkMask(
-  upperLipY: number,
-  lowerLipY: number,
-  faceHeight: number,
-): boolean {
-  const lipGap = Math.abs(lowerLipY - upperLipY) / faceHeight;
-  return lipGap < 0.105;
+  return {
+    yaw: calcYaw(noseTip.x, eyeMidX, faceWidth),
+    pitch: calcPitch(noseTip.y, eyeMidY, faceHeight),
+    roll: calcRoll(leftEyeCenter, rightEyeCenter),
+    masked: checkMask(positions[51].y, positions[57].y, faceHeight),
+    noseTip,
+  };
 }

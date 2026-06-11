@@ -8,11 +8,6 @@ export const injectStyles = () => {
   style.id = id;
   style.textContent = `
     @keyframes fr-pulse { 0%,100%{opacity:.7} 50%{opacity:1} }
-    @keyframes fr-flash { 0%{opacity:.85} 100%{opacity:0} }
-    @keyframes fr-countdown-ring {
-      from { stroke-dashoffset: 865; }
-      to   { stroke-dashoffset: 0; }
-    }
     @keyframes fr-fade-in { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
     @keyframes fr-scale-in { from{opacity:0;transform:scale(.85)} to{opacity:1;transform:scale(1)} }
     @keyframes fr-checkmark {
@@ -20,7 +15,7 @@ export const injectStyles = () => {
       100% { stroke-dashoffset: 0; }
     }
     @keyframes fr-spin { to { transform: rotate(360deg); } }
-    @keyframes fr-chevron-pulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+    @keyframes fr-slot-pop { from{transform:scale(.6);opacity:.4} to{transform:scale(1);opacity:1} }
   `;
   document.head.appendChild(style);
 };
@@ -194,15 +189,6 @@ export const S: Record<string, CSSProperties> = {
     zIndex: 5,
   },
   instruction: { fontSize: 17, fontWeight: 500, textAlign: "center" },
-  dots: { display: "flex", gap: 8 },
-  flash: {
-    position: "absolute",
-    inset: 0,
-    background: "#fff",
-    pointerEvents: "none",
-    animation: "fr-flash .35s ease-out forwards",
-    zIndex: 10,
-  },
 
   /* result */
   result: {
@@ -271,6 +257,63 @@ export const S: Record<string, CSSProperties> = {
     maxWidth: 380,
   },
   resultBtns: { display: "flex", gap: 12, width: "100%" },
+
+  /* processing */
+  processing: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    height: "100%",
+    padding: "0 32px",
+    textAlign: "center",
+    animation: "fr-fade-in .4s ease",
+  },
+  processingTitle: {
+    fontSize: 22,
+    fontWeight: 700,
+    letterSpacing: "-0.02em",
+    marginBottom: 8,
+  },
+  processingSub: {
+    fontSize: 15,
+    color: "rgba(255,255,255,.5)",
+  },
+
+  /* retry */
+  retry: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    height: "100%",
+    padding: "0 32px",
+    textAlign: "center",
+    animation: "fr-fade-in .5s ease",
+  },
+  retryIcon: {
+    width: 72,
+    height: 72,
+    borderRadius: "50%",
+    background: "rgba(255,107,107,.12)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 24,
+  },
+  retryTitle: {
+    fontSize: 24,
+    fontWeight: 700,
+    letterSpacing: "-0.02em",
+    marginBottom: 10,
+  },
+  retrySub: {
+    fontSize: 15,
+    color: "rgba(255,255,255,.55)",
+    lineHeight: 1.5,
+    maxWidth: 320,
+    marginBottom: 40,
+  },
 
   /* loading */
   loadingOverlay: {

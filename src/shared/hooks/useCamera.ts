@@ -4,13 +4,10 @@ export function useCamera() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const [videoDims, setVideoDims] = useState<{ w: number; h: number } | null>(
-    null,
-  );
+  const [videoDims, setVideoDims] = useState<{ w: number; h: number } | null>(null);
 
   const startCamera = useCallback(async () => {
     const portrait = window.innerHeight > window.innerWidth;
-
 
     const stream = await navigator.mediaDevices.getUserMedia({
       video: {

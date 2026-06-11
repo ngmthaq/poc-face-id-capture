@@ -4,14 +4,15 @@ export default {
     introTitle: "顔登録",
     introSub: "本人確認のために顔プロフィールを設定します",
     introStep1: "楕円のフレーム内に顔を配置してください",
-    introStep2: "十字線に合わせて頭を動かしてください",
-    introStep3: "カウントダウン中はじっとしてください",
+    introStep2: "頭をゆっくりと円を描くように回してください",
+    introStep3: "各角度を撮影する間、姿勢を保ってください",
     getStarted: "開始する",
     back: "戻る",
 
     // Capture screen
     hudTitle: "顔登録",
     hudProgress: "{{current}} / {{total}}",
+    recordingInstruction: "頭をゆっくりと円を描くように回してください",
 
     // Step instructions
     stepCenter: "正面を向いてください",
@@ -33,6 +34,16 @@ export default {
     labelTopRight: "右上",
     labelLeft: "左",
     labelRight: "右",
+
+    // Processing screen
+    processingTitle: "解析中",
+    processingSub: "動きの中から最適な画像を選んでいます...",
+
+    // Retry screen
+    retryTitle: "もう一度お試しください",
+    retrySub:
+      "すべての角度を撮影できませんでした。各位置が見えるように、もう少しゆっくり頭を回してください。",
+    retryButton: "もう一度試す",
 
     // Result screen
     resultTitle: "登録完了",

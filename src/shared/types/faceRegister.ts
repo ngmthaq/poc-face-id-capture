@@ -24,6 +24,12 @@ export interface FaceRegisterTranslations {
   outsideOval?: string;
   maskWarning?: string;
   maskWarningDetail?: string;
+  recordingInstruction?: string;
+  processingTitle?: string;
+  processingSub?: string;
+  retryTitle?: string;
+  retrySub?: string;
+  retryButton?: string;
   labelCenter?: string;
   labelTop?: string;
   labelTopLeft?: string;

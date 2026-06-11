@@ -1,17 +1,13 @@
-import { ACCENT, STEPS } from "../../shared/constants/faceRegister";
+import { STEPS } from "../../shared/constants/faceRegister";
+import type { StepName } from "../../shared/types/faceRegister";
 import { useTranslate } from "../../shared/translations";
 import { S } from "../../shared/styles/faceRegister";
-import SvgOverlay from "../../molecules/SvgOverlay";
+import ProgressRing from "../../molecules/ProgressRing";
 
 interface CaptureScreenProps {
   videoRef: React.RefObject<HTMLVideoElement | null>;
-  currentStep: number;
-  crosshairPos: { x: number; y: number };
-  matched: boolean;
-  countdownActive: boolean;
+  coveredSteps: Set<StepName>;
   nosePos: { x: number; y: number } | null;
-  showFlash: boolean;
-  outsideOval: boolean;
   maskWarning: boolean;
   onBack?: () => void;
   svgWidth: number;
@@ -20,34 +16,24 @@ interface CaptureScreenProps {
 
 export default function CaptureScreen({
   videoRef,
-  currentStep,
-  crosshairPos,
-  matched,
-  countdownActive,
+  coveredSteps,
   nosePos,
-  showFlash,
-  outsideOval,
   maskWarning,
   onBack,
   svgWidth,
   ovalCx,
 }: CaptureScreenProps) {
   const { t } = useTranslate();
-  const step = STEPS[currentStep] ?? STEPS[0];
 
   return (
     <div style={S.captureWrap}>
       <video ref={videoRef} playsInline muted style={S.video} />
-      <SvgOverlay
-        currentStep={currentStep}
-        crosshairPos={crosshairPos}
-        matched={matched}
-        countdownActive={countdownActive}
+      <ProgressRing
+        coveredSteps={coveredSteps}
         nosePos={nosePos}
         svgWidth={svgWidth}
         ovalCx={ovalCx}
       />
-      {showFlash && <div style={S.flash} />}
 
       {/* HUD top */}
       <div style={S.hud}>
@@ -71,7 +57,7 @@ export default function CaptureScreen({
         <div style={S.hudTitle}>{t("faceRegister.hudTitle")}</div>
         <div style={S.hudProgress}>
           {t("faceRegister.hudProgress", {
-            current: currentStep + 1,
+            current: coveredSteps.size,
             total: STEPS.length,
           })}
         </div>
@@ -80,11 +66,7 @@ export default function CaptureScreen({
       {/* bottom bar */}
       <div style={S.bottomBar}>
         <div style={S.instruction}>
-          {outsideOval
-            ? t("faceRegister.outsideOval")
-            : maskWarning
-              ? t("faceRegister.maskWarning")
-              : t(step.instructionKey)}
+          {maskWarning ? t("faceRegister.maskWarning") : t("faceRegister.recordingInstruction")}
         </div>
         {maskWarning && (
           <div
@@ -98,21 +80,6 @@ export default function CaptureScreen({
             {t("faceRegister.maskWarningDetail")}
           </div>
         )}
-        <div style={S.dots}>
-          {STEPS.map((_, i) => (
-            <div
-              key={i}
-              style={{
-                width: 8,
-                height: 8,
-                borderRadius: "50%",
-                background:
-                  i < currentStep ? ACCENT : i === currentStep ? "#fff" : "rgba(255,255,255,.2)",
-                transition: "background .3s",
-              }}
-            />
-          ))}
-        </div>
       </div>
     </div>
   );
