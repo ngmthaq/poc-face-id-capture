@@ -11,13 +11,13 @@ export const RECORDING_SAFETY_CAP_MS = 60000;
  * Combined yaw/pitch magnitude (degrees) below which the head is considered
  * near-centered and no ring tick fills. Keeps small jitter from lighting ticks.
  */
-export const SWEEP_DEADZONE_MAG = 2;
+export const SWEEP_DEADZONE_MAG = 3;
 
 /**
  * Angular half-width (degrees) around the head's ring angle within which ticks
  * fill, so a slow continuous sweep covers ticks without exact pixel aim.
  */
-export const SWEEP_FILL_TOLERANCE_DEG = 30;
+export const SWEEP_FILL_TOLERANCE_DEG = 25;
 
 /**
  * How long the fully-covered, all-green progress ring is held on screen before
