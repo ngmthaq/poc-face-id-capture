@@ -4,53 +4,74 @@ import * as faceapi from "@vladmandic/face-api";
 import { STEPS } from "../constants/steps";
 import {
   COVERAGE_DETECT_INTERVAL_MS,
-  MAX_RECORDING_MS,
+  RECORDING_SAFETY_CAP_MS,
   COMPLETE_HOLD_MS,
+  SWEEP_DEADZONE_MAG,
+  SWEEP_FILL_TOLERANCE_DEG,
 } from "../constants/recording";
+import { TICK_COUNT } from "../constants/geometry";
 import { MASK_THRESHOLD } from "../constants/detection";
-import type { StepName } from "../types/steps";
 import type { CaptureCoverageOptions, CaptureCoverage } from "../types/captureCoverage";
-import { measurePose, toSvgCoords, getSvgDims } from "../utils/faceCalculations";
+import {
+  measurePose,
+  toSvgCoords,
+  getSvgDims,
+  poseToRingAngle,
+  ticksForAngle,
+} from "../utils/faceCalculations";
 
 const isDev = import.meta.env.DEV;
 
 /**
- * Light live face-api loop driving the progress ring. It tracks which of the
- * six steps the user's pose has passed through (each step's own `check()` is
- * the coverage threshold) and reports the current nose position. It captures
- * no frames; selection happens later in post-processing. Fires `onComplete`
- * once every step is covered or `MAX_RECORDING_MS` elapses.
+ * Light live face-api loop driving the progress ring. A `center` alignment gate
+ * must pass first (the center step's own `check()`); once centered, the user
+ * slowly rotates their head and each ring tick fills only when the head points
+ * in that tick's direction. It captures no frames; selection happens later in
+ * post-processing. Fires `onComplete` once center is covered and all ticks are
+ * filled, or `RECORDING_SAFETY_CAP_MS` elapses.
  */
 export function useCaptureCoverage({
   videoRef,
   active,
   onComplete,
 }: CaptureCoverageOptions): CaptureCoverage {
-  const [coveredSteps, setCoveredSteps] = useState<Set<StepName>>(new Set());
+  const [coveredTicks, setCoveredTicks] = useState<Set<number>>(new Set());
+  const [centerCovered, setCenterCovered] = useState(false);
   const [nosePos, setNosePos] = useState<{ x: number; y: number } | null>(null);
   const [maskWarning, setMaskWarning] = useState(false);
   const [complete, setComplete] = useState(false);
 
-  const coveredRef = useRef<Set<StepName>>(new Set());
+  const coveredTicksRef = useRef<Set<number>>(new Set());
+  const centerCoveredRef = useRef(false);
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
 
-  const markCovered = useCallback((name: StepName) => {
-    if (coveredRef.current.has(name)) return;
-    const next = new Set(coveredRef.current);
-    next.add(name);
-    coveredRef.current = next;
-    setCoveredSteps(next);
+  const markTicks = useCallback((indices: number[]) => {
+    let changed = false;
+    const next = new Set(coveredTicksRef.current);
+    for (const i of indices) {
+      if (!next.has(i)) {
+        next.add(i);
+        changed = true;
+      }
+    }
+    if (!changed) return;
+    coveredTicksRef.current = next;
+    setCoveredTicks(next);
   }, []);
 
   useEffect(() => {
     if (!active) return;
 
-    coveredRef.current = new Set();
-    setCoveredSteps(new Set());
+    coveredTicksRef.current = new Set();
+    centerCoveredRef.current = false;
+    setCoveredTicks(new Set());
+    setCenterCovered(false);
     setNosePos(null);
     setMaskWarning(false);
     setComplete(false);
+
+    const centerStep = STEPS.find((s) => s.name === "center");
 
     let stopped = false;
     let loopTimer = 0;
@@ -102,14 +123,22 @@ export function useCaptureCoverage({
           else if (noMaskFrames >= MASK_THRESHOLD) setMaskWarning(false);
 
           if (!pose.masked) {
-            for (const step of STEPS) {
-              if (coveredRef.current.has(step.name)) continue;
-              if (step.check(pose.yaw, pose.pitch, pose.roll)) markCovered(step.name);
+            if (!centerCoveredRef.current) {
+              if (centerStep?.check(pose.yaw, pose.pitch, pose.roll)) {
+                centerCoveredRef.current = true;
+                setCenterCovered(true);
+              }
+            } else {
+              const mag = Math.hypot(pose.yaw, pose.pitch);
+              if (mag >= SWEEP_DEADZONE_MAG) {
+                const theta = poseToRingAngle(pose.yaw, pose.pitch);
+                markTicks(ticksForAngle(theta, TICK_COUNT, SWEEP_FILL_TOLERANCE_DEG));
+              }
             }
           }
 
-          if (coveredRef.current.size >= STEPS.length) {
-            if (isDev) console.log("[FaceReg] coverage complete — all steps covered");
+          if (centerCoveredRef.current && coveredTicksRef.current.size >= TICK_COUNT) {
+            if (isDev) console.log("[FaceReg] coverage complete — center + all ticks covered");
             stopped = true;
             window.clearTimeout(loopTimer);
             setComplete(true);
@@ -123,8 +152,8 @@ export function useCaptureCoverage({
         console.warn("[FaceReg] coverage detection error:", err);
       }
 
-      if (performance.now() - startedAt >= MAX_RECORDING_MS) {
-        if (isDev) console.log("[FaceReg] coverage timeout reached");
+      if (performance.now() - startedAt >= RECORDING_SAFETY_CAP_MS) {
+        if (isDev) console.log("[FaceReg] coverage safety cap reached");
         finish();
         return;
       }
@@ -140,7 +169,7 @@ export function useCaptureCoverage({
       stopped = true;
       window.clearTimeout(loopTimer);
     };
-  }, [active, videoRef, markCovered]);
+  }, [active, videoRef, markTicks]);
 
-  return { coveredSteps, nosePos, maskWarning, complete };
+  return { coveredTicks, centerCovered, nosePos, maskWarning, complete };
 }

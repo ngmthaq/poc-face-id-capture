@@ -1,7 +1,23 @@
 /* ── circular-motion recording + post-processing ── */
 
-/** Hard cap on a single recording session before auto-stop kicks in. */
-export const MAX_RECORDING_MS = 15000;
+/**
+ * Generous safety cap (ms) on a single recording session. The continuous
+ * head-sweep flow has no hard timeout; this only prevents an indefinitely
+ * running session if the user never completes coverage.
+ */
+export const RECORDING_SAFETY_CAP_MS = 60000;
+
+/**
+ * Combined yaw/pitch magnitude (degrees) below which the head is considered
+ * near-centered and no ring tick fills. Keeps small jitter from lighting ticks.
+ */
+export const SWEEP_DEADZONE_MAG = 2;
+
+/**
+ * Angular half-width (degrees) around the head's ring angle within which ticks
+ * fill, so a slow continuous sweep covers ticks without exact pixel aim.
+ */
+export const SWEEP_FILL_TOLERANCE_DEG = 30;
 
 /**
  * How long the fully-covered, all-green progress ring is held on screen before
@@ -29,7 +45,7 @@ export const FRAME_SAMPLE_INTERVAL_MS = 60;
 export const SEEK_TIMEOUT_MS = 3000;
 
 /** JPEG quality used when rendering a selected frame to a data URL. */
-export const CAPTURE_JPEG_QUALITY = 0.92;
+export const CAPTURE_JPEG_QUALITY = 0.8;
 
 /**
  * Pose-match weights for `scorePoseAgainstStep`. Yaw and pitch carry the

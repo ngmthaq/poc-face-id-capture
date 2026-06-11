@@ -1,12 +1,13 @@
 import { STEPS } from "../../shared/constants/steps";
-import type { StepName } from "../../shared/types/steps";
+import { TICK_COUNT } from "../../shared/constants/geometry";
 import { useTranslate } from "../../shared/translations";
 import { S } from "../../shared/styles/faceRegister";
 import ProgressRing from "../../molecules/ProgressRing";
 
 interface CaptureScreenProps {
   videoRef: React.RefObject<HTMLVideoElement | null>;
-  coveredSteps: Set<StepName>;
+  coveredTicks: Set<number>;
+  centerCovered: boolean;
   nosePos: { x: number; y: number } | null;
   maskWarning: boolean;
   complete: boolean;
@@ -17,7 +18,8 @@ interface CaptureScreenProps {
 
 export default function CaptureScreen({
   videoRef,
-  coveredSteps,
+  coveredTicks,
+  centerCovered,
   nosePos,
   maskWarning,
   complete,
@@ -27,14 +29,14 @@ export default function CaptureScreen({
 }: CaptureScreenProps) {
   const { t } = useTranslate();
 
-  const nextStep = STEPS.find((s) => !coveredSteps.has(s.name)) ?? null;
+  const centerStep = STEPS.find((s) => s.name === "center");
 
   return (
     <div style={S.captureWrap}>
       <video ref={videoRef} playsInline muted style={S.video} />
       <ProgressRing
-        coveredSteps={coveredSteps}
-        nextStep={nextStep?.name ?? null}
+        coveredTicks={coveredTicks}
+        centerCovered={centerCovered}
         nosePos={nosePos}
         complete={complete}
         svgWidth={svgWidth}
@@ -63,8 +65,8 @@ export default function CaptureScreen({
         <div style={S.hudTitle}>{t("faceRegister.hudTitle")}</div>
         <div style={S.hudProgress}>
           {t("faceRegister.hudProgress", {
-            current: coveredSteps.size,
-            total: STEPS.length,
+            current: coveredTicks.size,
+            total: TICK_COUNT,
           })}
         </div>
       </div>
@@ -74,8 +76,8 @@ export default function CaptureScreen({
         <div style={S.instruction}>
           {maskWarning
             ? t("faceRegister.maskWarning")
-            : nextStep
-              ? t(nextStep.instructionKey)
+            : !centerCovered
+              ? t(centerStep?.instructionKey ?? "faceRegister.stepCenter")
               : t("faceRegister.recordingInstruction")}
         </div>
         {maskWarning && (

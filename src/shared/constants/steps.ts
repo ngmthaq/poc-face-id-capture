@@ -1,4 +1,4 @@
-import type { StepDef, StepName } from "../types/steps";
+import type { StepDef } from "../types/steps";
 
 export const STEPS: StepDef[] = [
   {
@@ -14,7 +14,7 @@ export const STEPS: StepDef[] = [
     labelKey: "faceRegister.labelTop",
     instructionKey: "faceRegister.stepTop",
     target: { x: 200, y: 255 },
-    pose: { yaw: 0, pitch: -13, roll: 0 },
+    pose: { yaw: 0, pitch: -10, roll: 0 },
     check: (y, p) => p < -4 && p > -28 && Math.abs(y) < 18,
   },
   {
@@ -50,13 +50,3 @@ export const STEPS: StepDef[] = [
     check: (y, p) => y < -4 && p >= -2 && p < 20,
   },
 ];
-
-/** Angle in degrees for the chevron on the oval edge per step (null = no chevron). */
-export const STEP_ANGLES: Record<StepName, number | null> = {
-  center: null,
-  top: -90,
-  topLeft: -135,
-  topRight: -45,
-  left: 180,
-  right: 0,
-};

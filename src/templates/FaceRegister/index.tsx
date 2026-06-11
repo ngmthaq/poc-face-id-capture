@@ -88,7 +88,7 @@ export default function FaceRegister({
     }
   }, [stopRecording, stopCamera, process, showResultScreen, onComplete]);
 
-  const { coveredSteps, nosePos, maskWarning, complete } = useCaptureCoverage({
+  const { coveredTicks, centerCovered, nosePos, maskWarning, complete } = useCaptureCoverage({
     videoRef,
     active: screen === "capture" && modelsLoaded,
     onComplete: finishRecording,
@@ -149,7 +149,8 @@ export default function FaceRegister({
         {screen === "capture" && (
           <CaptureScreen
             videoRef={videoRef}
-            coveredSteps={coveredSteps}
+            coveredTicks={coveredTicks}
+            centerCovered={centerCovered}
             nosePos={nosePos}
             maskWarning={maskWarning}
             complete={complete}

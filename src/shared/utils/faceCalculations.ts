@@ -34,6 +34,36 @@ export function calcRoll(leftEyeCenter: Point, rightEyeCenter: Point): number {
   );
 }
 
+/** Smallest signed angular difference `a - b` (degrees), normalized to [-180, 180]. */
+export function angularDifference(a: number, b: number): number {
+  return ((((a - b) % 360) + 540) % 360) - 180;
+}
+
+/**
+ * Map a head pose to a ring angle (degrees) on the progress circle.
+ * Convention: 0° = right (+x), 90° = down (+y), -90° = up. From the step
+ * targets, `yaw < 0` points screen-right and `pitch < 0` points up, so the
+ * ring angle is `atan2(pitch, -yaw)`.
+ */
+export function poseToRingAngle(yaw: number, pitch: number): number {
+  return Math.atan2(pitch, -yaw) * (180 / Math.PI);
+}
+
+/**
+ * Indices of all evenly-spaced ticks whose angle `(360/count)*i` lies within
+ * `toleranceDeg` of `angleDeg` (smallest signed angular difference).
+ */
+export function ticksForAngle(angleDeg: number, count: number, toleranceDeg: number): number[] {
+  const indices: number[] = [];
+  for (let i = 0; i < count; i++) {
+    const tickAngle = (360 / count) * i;
+    if (Math.abs(angularDifference(angleDeg, tickAngle)) <= toleranceDeg) {
+      indices.push(i);
+    }
+  }
+  return indices;
+}
+
 export function toSvgCoords(
   px: number,
   py: number,
