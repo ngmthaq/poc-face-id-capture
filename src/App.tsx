@@ -5,7 +5,7 @@ export default function App() {
     <FaceRegister
       onComplete={(captures) => console.log("Captures:", captures)}
       onExit={() => {}}
-      locale="ja"
+      locale="en"
     />
   );
 }
