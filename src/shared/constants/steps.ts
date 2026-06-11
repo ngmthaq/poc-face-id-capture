@@ -30,7 +30,7 @@ export const STEPS: StepDef[] = [
     labelKey: "faceRegister.labelTopRight",
     instructionKey: "faceRegister.stepTopRight",
     target: { x: 220, y: 260 },
-    pose: { yaw: -16, pitch: -12, roll: 0 },
+    pose: { yaw: -16, pitch: -6, roll: 0 },
     check: (y, p) => y < -4 && p < -2 && p > -28,
   },
   {
@@ -46,7 +46,7 @@ export const STEPS: StepDef[] = [
     labelKey: "faceRegister.labelRight",
     instructionKey: "faceRegister.stepRight",
     target: { x: 220, y: 280 },
-    pose: { yaw: -18, pitch: 0, roll: 0 },
+    pose: { yaw: -18, pitch: 9, roll: 0 },
     check: (y, p) => y < -4 && p >= -2 && p < 20,
   },
 ];

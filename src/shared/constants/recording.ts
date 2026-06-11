@@ -19,7 +19,7 @@ export const COVERAGE_DETECT_INTERVAL_MS = 250;
  * Interval (ms of video time) at which the recorded blob is sampled into
  * frames during post-processing.
  */
-export const FRAME_SAMPLE_INTERVAL_MS = 120;
+export const FRAME_SAMPLE_INTERVAL_MS = 60;
 
 /**
  * Max wall-clock time (ms) to wait for a single seek (or the duration-forcing

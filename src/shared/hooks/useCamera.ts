@@ -1,5 +1,7 @@
 import { useRef, useState, useCallback } from "react";
 
+const isDev = import.meta.env.DEV;
+
 export function useCamera() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -17,13 +19,17 @@ export function useCamera() {
       },
     });
     streamRef.current = stream;
-    if (videoRef.current) {
-      videoRef.current.srcObject = stream;
-      await videoRef.current.play();
-      setVideoDims({
-        w: videoRef.current.videoWidth,
-        h: videoRef.current.videoHeight,
-      });
+    const video = videoRef.current;
+    if (video) {
+      video.srcObject = stream;
+      video.muted = true;
+      video.playsInline = true;
+      try {
+        await video.play();
+      } catch (err) {
+        if (isDev) console.warn("[FaceReg] video autoplay blocked:", err);
+      }
+      setVideoDims({ w: video.videoWidth, h: video.videoHeight });
     }
   }, []);
 
