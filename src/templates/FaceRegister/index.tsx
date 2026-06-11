@@ -11,6 +11,7 @@ import { useFaceRecorder } from "../../shared/hooks/useFaceRecorder";
 import { useCaptureCoverage } from "../../shared/hooks/useCaptureCoverage";
 import { usePostProcess } from "../../shared/hooks/usePostProcess";
 import { getSvgDims } from "../../shared/utils/faceCalculations";
+import IntroScreen from "../../organisms/IntroScreen";
 import CaptureScreen from "../../organisms/CaptureScreen";
 import ProcessingScreen from "../../organisms/ProcessingScreen";
 import ResultScreen from "../../organisms/ResultScreen";
@@ -45,7 +46,7 @@ export default function FaceRegister({
     ? getSvgDims(videoDims.w, videoDims.h)
     : { svgWidth: SVG_WIDTH, svgHeight: 600, cx: CIRCLE_CX };
 
-  const [screen, setScreen] = useState<Screen>("capture");
+  const [screen, setScreen] = useState<Screen>("intro");
   const [captures, setCaptures] = useState<Capture[]>([]);
 
   const recordingRef = useRef(false);
@@ -93,6 +94,11 @@ export default function FaceRegister({
     active: screen === "capture" && modelsLoaded,
     onComplete: finishRecording,
   });
+
+  /* ── advance from intro to capture ── */
+  const handleStart = useCallback(() => {
+    setScreen("capture");
+  }, []);
 
   /* ── restart capture (Register Again) ── */
   const startCapture = useCallback(() => {
@@ -145,6 +151,8 @@ export default function FaceRegister({
         <canvas ref={canvasRef} style={{ display: "none" }} />
 
         {loading && <LoadingOverlay />}
+
+        {screen === "intro" && <IntroScreen onStart={handleStart} onExit={onExit} />}
 
         {screen === "capture" && (
           <CaptureScreen
