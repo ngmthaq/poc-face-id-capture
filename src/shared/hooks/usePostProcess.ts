@@ -1,14 +1,11 @@
 import { useCallback } from "react";
 import * as faceapi from "@vladmandic/face-api";
 
-import { STEPS, CAPTURE_JPEG_QUALITY } from "../constants/faceRegister";
+import { STEPS } from "../constants/steps";
+import { CAPTURE_JPEG_QUALITY } from "../constants/recording";
 import { measurePose } from "../utils/faceCalculations";
-import {
-  scorePoseAgainstStep,
-  selectBestFramesPerStep,
-  type ScoredFrame,
-  type FrameSelection,
-} from "../utils/poseScoring";
+import { scorePoseAgainstStep, selectBestFramesPerStep } from "../utils/poseScoring";
+import type { ScoredFrame, FrameSelection } from "../types/poseScoring";
 import { extractFrames } from "../utils/videoFrameExtractor";
 
 const isDev = import.meta.env.DEV;

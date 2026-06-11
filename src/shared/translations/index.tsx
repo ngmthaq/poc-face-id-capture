@@ -1,9 +1,7 @@
 import { createContext, useContext, type ReactNode } from "react";
-import type { FaceRegisterTranslations } from "../types/faceRegister";
+import type { FaceRegisterTranslations, TranslationBundle } from "../types/translations";
 import en from "./locales/en";
 import ja from "./locales/ja";
-
-export type TranslationBundle = typeof en;
 
 export const TRANSLATIONS: Record<string, TranslationBundle> = { en, ja };
 

@@ -1,28 +1,14 @@
 import { useRef, useState, useCallback, useEffect } from "react";
 import * as faceapi from "@vladmandic/face-api";
 
-import {
-  STEPS,
-  COVERAGE_DETECT_INTERVAL_MS,
-  MAX_RECORDING_MS,
-  MASK_THRESHOLD,
-} from "../constants/faceRegister";
-import type { StepName } from "../types/faceRegister";
+import { STEPS } from "../constants/steps";
+import { COVERAGE_DETECT_INTERVAL_MS, MAX_RECORDING_MS } from "../constants/recording";
+import { MASK_THRESHOLD } from "../constants/detection";
+import type { StepName } from "../types/steps";
+import type { CaptureCoverageOptions, CaptureCoverage } from "../types/captureCoverage";
 import { measurePose, toSvgCoords, getSvgDims } from "../utils/faceCalculations";
 
 const isDev = import.meta.env.DEV;
-
-interface CaptureCoverageOptions {
-  videoRef: React.RefObject<HTMLVideoElement | null>;
-  active: boolean;
-  onComplete: () => void;
-}
-
-interface CaptureCoverage {
-  coveredSteps: Set<StepName>;
-  nosePos: { x: number; y: number } | null;
-  maskWarning: boolean;
-}
 
 /**
  * Light live face-api loop driving the progress ring. It tracks which of the

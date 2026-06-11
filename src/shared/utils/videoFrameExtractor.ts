@@ -1,16 +1,5 @@
-import { FRAME_SAMPLE_INTERVAL_MS, SEEK_TIMEOUT_MS } from "../constants/faceRegister";
-
-export interface ExtractedFrame {
-  canvas: HTMLCanvasElement;
-  timestampMs: number;
-}
-
-interface ExtractOptions {
-  intervalMs?: number;
-}
-
-/** Huge seek target used to force the browser to resolve a real duration. */
-const DURATION_PROBE_TIME = 1e101;
+import { FRAME_SAMPLE_INTERVAL_MS, SEEK_TIMEOUT_MS } from "../constants/recording";
+import type { ExtractedFrame, ExtractOptions } from "../types/videoFrame";
 
 /**
  * Decode a recorded video Blob into sampled frames. Loads the blob into an
@@ -74,6 +63,9 @@ function loadMetadata(video: HTMLVideoElement): Promise<void> {
  * times out — never hangs.
  */
 async function resolveDuration(video: HTMLVideoElement): Promise<number> {
+  /** Huge seek target used to force the browser to resolve a real duration. */
+  const DURATION_PROBE_TIME = 1e101;
+
   if (Number.isFinite(video.duration) && video.duration > 0) {
     return video.duration;
   }

@@ -1,13 +1,13 @@
+import { ACCENT, IDLE_STROKE } from "../../shared/constants/theme";
+import { STEPS, STEP_ANGLES } from "../../shared/constants/steps";
 import {
-  ACCENT,
-  STEPS,
-  STEP_ANGLES,
   OVAL_CY,
   OVAL_RX,
   OVAL_RY,
   SVG_HEIGHT,
-} from "../../shared/constants/faceRegister";
-import type { StepName } from "../../shared/types/faceRegister";
+  SLOT_RADIUS,
+} from "../../shared/constants/geometry";
+import type { StepName } from "../../shared/types/steps";
 import { S } from "../../shared/styles/faceRegister";
 
 interface ProgressRingProps {
@@ -16,9 +16,6 @@ interface ProgressRingProps {
   svgWidth: number;
   ovalCx: number;
 }
-
-const IDLE_STROKE = "rgba(255,255,255,0.25)";
-const SLOT_RADIUS = 7;
 
 /**
  * SVG ring around the capture oval. The `center` step lights the oval outline;

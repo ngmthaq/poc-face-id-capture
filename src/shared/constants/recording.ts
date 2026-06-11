@@ -1,0 +1,36 @@
+/* ── circular-motion recording + post-processing ── */
+
+/** Hard cap on a single recording session before auto-stop kicks in. */
+export const MAX_RECORDING_MS = 15000;
+
+/**
+ * Cadence (ms) of the lightweight live coverage detection loop while
+ * recording. Kept low-frequency so recording stays smooth.
+ */
+export const COVERAGE_DETECT_INTERVAL_MS = 250;
+
+/**
+ * Interval (ms of video time) at which the recorded blob is sampled into
+ * frames during post-processing.
+ */
+export const FRAME_SAMPLE_INTERVAL_MS = 120;
+
+/**
+ * Max wall-clock time (ms) to wait for a single seek (or the duration-forcing
+ * probe) during frame extraction. A stalled seek resolves/skips on timeout so
+ * the post-processing pipeline can never hang indefinitely.
+ */
+export const SEEK_TIMEOUT_MS = 3000;
+
+/** JPEG quality used when rendering a selected frame to a data URL. */
+export const CAPTURE_JPEG_QUALITY = 0.92;
+
+/**
+ * Pose-match weights for `scorePoseAgainstStep`. Yaw and pitch carry the
+ * pose intent; roll is a smaller tie-breaker that rewards an upright head.
+ */
+export const POSE_WEIGHTS = {
+  yaw: 1,
+  pitch: 1,
+  roll: 0.5,
+} as const;

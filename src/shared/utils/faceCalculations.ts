@@ -1,15 +1,5 @@
-import { SVG_HEIGHT } from "../constants/faceRegister";
-
-interface Point {
-  x: number;
-  y: number;
-}
-
-export interface SvgDims {
-  svgWidth: number;
-  svgHeight: number;
-  ovalCx: number;
-}
+import { SVG_HEIGHT } from "../constants/geometry";
+import type { Point, SvgDims, FaceLandmarks, PoseMeasurement } from "../types/faceCalculations";
 
 /**
  * Compute SVG viewBox dimensions that match the video's aspect ratio.
@@ -60,21 +50,6 @@ export function toSvgCoords(
 export function checkMask(upperLipY: number, lowerLipY: number, faceHeight: number): boolean {
   const lipGap = Math.abs(lowerLipY - upperLipY) / faceHeight;
   return lipGap < 0.105;
-}
-
-export interface FaceLandmarks {
-  positions: Point[];
-  getLeftEye: () => Point[];
-  getRightEye: () => Point[];
-  getJawOutline: () => Point[];
-}
-
-export interface PoseMeasurement {
-  yaw: number;
-  pitch: number;
-  roll: number;
-  masked: boolean;
-  noseTip: Point;
 }
 
 /**

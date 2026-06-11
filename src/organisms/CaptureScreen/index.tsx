@@ -1,5 +1,5 @@
-import { STEPS } from "../../shared/constants/faceRegister";
-import type { StepName } from "../../shared/types/faceRegister";
+import { STEPS } from "../../shared/constants/steps";
+import type { StepName } from "../../shared/types/steps";
 import { useTranslate } from "../../shared/translations";
 import { S } from "../../shared/styles/faceRegister";
 import ProgressRing from "../../molecules/ProgressRing";

@@ -1,4 +1,4 @@
-import { ACCENT } from "../../shared/constants/faceRegister";
+import { ACCENT } from "../../shared/constants/theme";
 import { useTranslate } from "../../shared/translations";
 import { S } from "../../shared/styles/faceRegister";
 

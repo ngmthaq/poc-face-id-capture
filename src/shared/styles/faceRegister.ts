@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { ACCENT, BG } from "../constants/faceRegister";
+import { ACCENT, BG } from "../constants/theme";
 
 export const injectStyles = () => {
   const id = "face-register-styles";

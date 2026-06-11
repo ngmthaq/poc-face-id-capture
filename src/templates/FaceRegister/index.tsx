@@ -1,10 +1,9 @@
 import { useRef, useState, useEffect, useCallback, useMemo } from "react";
-import { SVG_WIDTH, OVAL_CX, type Screen } from "../../shared/constants/faceRegister";
-import type {
-  Capture,
-  FaceRegisterProps,
-  FaceRegisterTranslations,
-} from "../../shared/types/faceRegister";
+import { SVG_WIDTH, OVAL_CX } from "../../shared/constants/geometry";
+import type { Capture } from "../../shared/types/capture";
+import type { FaceRegisterProps } from "../../shared/types/props";
+import type { FaceRegisterTranslations } from "../../shared/types/translations";
+import type { Screen } from "../../shared/types/screen";
 import { TranslationProvider, resolveTranslations } from "../../shared/translations";
 import { injectStyles, S } from "../../shared/styles/faceRegister";
 import { useCamera } from "../../shared/hooks/useCamera";

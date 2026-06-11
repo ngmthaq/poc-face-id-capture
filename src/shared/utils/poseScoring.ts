@@ -1,12 +1,8 @@
-import { POSE_WEIGHTS, STEPS, type StepDef } from "../constants/faceRegister";
-import type { Capture, StepName } from "../types/faceRegister";
-
-export interface ScoredFrame {
-  step: StepDef;
-  score: number;
-  qualifies: boolean;
-  data: string;
-}
+import { STEPS } from "../constants/steps";
+import { POSE_WEIGHTS } from "../constants/recording";
+import type { StepDef, StepName } from "../types/steps";
+import type { Capture } from "../types/capture";
+import type { ScoredFrame, FrameSelection } from "../types/poseScoring";
 
 /**
  * Score how well a measured head pose matches a step's ideal pose.
@@ -23,11 +19,6 @@ export function scorePoseAgainstStep(
   const dPitch = (pitch - step.pose.pitch) * POSE_WEIGHTS.pitch;
   const dRoll = (roll - step.pose.roll) * POSE_WEIGHTS.roll;
   return -Math.sqrt(dYaw * dYaw + dPitch * dPitch + dRoll * dRoll);
-}
-
-export interface FrameSelection {
-  captures: Capture[];
-  missingSteps: StepName[];
 }
 
 /**

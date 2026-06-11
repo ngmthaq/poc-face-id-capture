@@ -1,10 +1,6 @@
-export type StepName = "center" | "top" | "topLeft" | "topRight" | "left" | "right";
+import type en from "../translations/locales/en";
 
-export interface Capture {
-  step: StepName;
-  labelKey: string;
-  data: string;
-}
+export type TranslationBundle = typeof en;
 
 export interface FaceRegisterTranslations {
   introTitle?: string;
@@ -43,13 +39,4 @@ export interface FaceRegisterTranslations {
   loadingModels?: string;
   back?: string;
   discard?: string;
-}
-
-export interface FaceRegisterProps {
-  onComplete?: (captures: Capture[]) => void;
-  onExit?: () => void;
-  locale: string;
-  translations?: FaceRegisterTranslations;
-  /** Reserved for future verbose logging. Currently a no-op. Default `true`. */
-  enableDebug?: boolean;
 }
